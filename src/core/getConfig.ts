@@ -9,6 +9,8 @@ export interface ServerConfig {
   isFriendOnly: boolean
   loginMinLength: number
   loginMaxLength: number
+  passwordMinLength: number
+  passwordMaxLength: number
 }
 
 export function initConfig(): void {
@@ -35,6 +37,8 @@ function getDefaultConfig(): ServerConfig {
     isFriendOnly: true,
     loginMinLength: 3,
     loginMaxLength: 20,
+    passwordMinLength: 3,
+    passwordMaxLength: 20,
   }
 }
 function readConfig(): string | null {
