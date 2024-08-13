@@ -1,12 +1,8 @@
 import fastify from "fastify"
-import { initConfig } from "./core/getConfig.js"
 import { Game } from "./game/Game.js"
-import { Gate } from "./mp/routes/Gate.js"
-import { GateAuth } from "./mp/routes/GateAuth.js"
-import { GateRegister } from "./mp/routes/GateRegister.js"
 
 await import("./globals.js")
-initConfig()
+const runtime = await import("./runtime.js")
 
 export async function initApp() {
   const game = new Game()
@@ -18,9 +14,11 @@ export async function initApp() {
     ban: 3_000,
   })
 
-  app.route(new Gate().route())
-  app.route(new GateAuth().route())
-  app.route(new GateRegister().route())
+  app.addHook("preValidation", runtime.bansManager.createFastifyHook())
+
+  app.route(runtime.gate.createFastifyRoute())
+  app.route(runtime.gateAuth.createFastifyRoute())
+  app.route(runtime.gateRegister.createFastifyRoute())
 
   app.listen({ port: cfg().port })
 }

@@ -1,34 +1,19 @@
 import { JSONSchema } from "json-schema-to-ts"
-import { User } from "../../core/User.js"
+import { User } from "../core/User.js"
+import { BB_Requests } from "api-types"
+import { Routable, Route, RequestHandler } from "utility-types"
 
 /**
  * Врата.
  * Принимают подключения к серверу и аутефицируют пользователя
  */
 export class Gate implements Routable {
-  route(): Route<GateRequests["/gate/connect"]> {
+  createFastifyRoute(): Route<BB_Requests["/gate/connect"]> {
     return {
       url: "/gate/connect",
       method: "POST",
 
-      handler: async (req, res) => {
-        const { login, token } = req.body
-        if (!this.#isAuthorized(login, token)) {
-          if (cfg().isFriendOnly) return res.status(200)
-          return res
-            .status(401)
-            .header("Content-Type", "application/json; charset=utf-8")
-            .send({ firstTime: true })
-        } else {
-          if (cfg().isFriendOnly) return res.status(200)
-          if (!this.#tokensAreMatch(login, token))
-            return res
-              .status(401)
-              .header("Content-Type", "application/json; charset=utf-8")
-              .send({ firstTime: false })
-        }
-      },
-
+      handler: this.#requestHandler.bind(this),
       schema: {
         body: {
           type: "object",
@@ -49,6 +34,27 @@ export class Gate implements Routable {
     }
   }
 
+  #requestHandler: RequestHandler<BB_Requests["/gate/connect"]> = async (
+    req,
+    res
+  ) => {
+    const { login, token } = req.body
+    if (!this.#isAuthorized(login, token)) {
+      if (cfg().isFriendOnly) return res.status(200)
+      return res
+        .status(401)
+        .header("Content-Type", "application/json; charset=utf-8")
+        .send({ firstTime: true })
+    } else {
+      if (cfg().isFriendOnly) return res.status(200)
+      if (!this.#tokensAreMatch(login, token))
+        return res
+          .status(401)
+          .header("Content-Type", "application/json; charset=utf-8")
+          .send({ firstTime: false })
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////////
 
   #isAuthorized(login: string, token: string | undefined) {
@@ -62,14 +68,5 @@ export class Gate implements Routable {
       (it) => it.login == login && it.token == token
     )
     return Boolean(maybeUser)
-  }
-}
-
-export interface GateRequests extends TypedReqestsMap {
-  "/gate/connect": {
-    Body: {
-      login: string
-      token?: string
-    }
   }
 }

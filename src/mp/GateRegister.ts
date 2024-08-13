@@ -1,18 +1,17 @@
+import { BB_Requests } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
+import { RequestHandler, Routable, Route } from "utility-types"
 
 /**
  * Регистрация (запрос пароля) аккаунта на публичных серверах.
  */
 export class GateRegister implements Routable {
-  route(): Route<GateRegisterRequests["/gate/register"]> {
+  createFastifyRoute(): Route<BB_Requests["/gate/register"]> {
     return {
       url: "/gate/register",
       method: "POST",
 
-      handler: async (req, res) => {
-        const { login, password } = req.body
-      },
-
+      handler: this.#requestsHandler.bind(this),
       schema: {
         body: {
           type: "object",
@@ -33,13 +32,9 @@ export class GateRegister implements Routable {
       },
     }
   }
-}
 
-export interface GateRegisterRequests extends TypedReqestsMap {
-  "/gate/register": {
-    Body: {
-      login: string
-      password: string
-    }
-  }
+  #requestsHandler: RequestHandler<BB_Requests["/gate/register"]> = async (
+    req,
+    res
+  ) => {}
 }

@@ -15,10 +15,12 @@ locale: `ru_RU` (native)
 
 ```ts
 {
-  login: string
-  token?: string
+  login: string(len 3-20*)
+  token?: string(len 1-1000)
 }
 ```
+
+\* modifiable for server administrators
 
 **RESPONSE:**
 
@@ -56,7 +58,60 @@ body: {
 
 ```ts
 {
-  login: string
-  password: string
+  login: string(len 3-20*)
+  password: string(len 3-20*)
 }
+```
+
+\* modifiable for server administrators
+
+**RESPONSE:**
+
+```ts
+//Успешная регистрация
+status: 200 //OK
+body: {
+  token: string
+}
+//Не забыть поместить токен в localStorage
+// и начать отправлять запросы с заголовком 'Authorization': 'ТУТ ТОКЕН'
+//Следующий шаг - запросить страницу самого сервера
+```
+
+## `POST /gate/auth`
+
+Аутефикация пользователя (на данный момент - запрос пароля)
+
+**REQ BODY:**
+
+```ts
+{
+  login: string(len 3-20*)
+  password: string(len 3-20*)
+}
+```
+
+\* modifiable for server administrators
+
+**RESPONSE:**
+
+```ts
+//Успешная регистрация
+status: 200 //OK
+body: {
+  token: string
+}
+//Не забыть поместить токен в localStorage
+// и начать отправлять запросы с заголовком 'Authorization': 'ТУТ ТОКЕН'
+//Следующий шаг - запросить страницу самого сервера
+```
+
+```ts
+//Неверный пароль
+status: 406 //Not Acceptable
+body: {
+  availableTries: number(range 1-inf) //Кол-во доступных попыток на ввод пароля
+}
+//Если пользователь исчерпывает попытки - он получает блокировку по IP на сервере.
+//Сам аккаунт не попадает под блокировку
 ```
