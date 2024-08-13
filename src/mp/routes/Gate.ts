@@ -1,25 +1,18 @@
-import { RequestGenericInterface } from "fastify"
 import { JSONSchema } from "json-schema-to-ts"
-import { User } from "../core/User.js"
-import { Game } from "../game/Game.js"
+import { User } from "../../core/User.js"
 
 /**
  * Врата.
  * Принимают подключения к серверу и аутефицируют пользователя
  */
-export class Gate {
-  constructor(game: Game, app: App) {
-    app.route(this.Route_connection())
-  }
-
-  private Route_connection(): Route<Gate.Routes["/connect"]> {
+export class Gate implements Routable {
+  route(): Route<GateRequests["/gate/connect"]> {
     return {
-      url: "/connect",
+      url: "/gate/connect",
       method: "POST",
 
       handler: async (req, res) => {
-        const login = req.body.login
-        const token = req.body.token
+        const { login, token } = req.body
         if (!this.#isAuthorized(login, token)) {
           if (cfg().isFriendOnly) return res.status(200)
           return res
@@ -56,35 +49,6 @@ export class Gate {
     }
   }
 
-  private Route_connectionAuth(): Route<Gate.Routes["/connect/auth"]> {
-    return {
-      url: "/connect/auth",
-      method: "POST",
-
-      handler: async (req, res) => {},
-
-      schema: {
-        body: {
-          type: "object",
-          required: ["login", "password"],
-          properties: {
-            login: {
-              type: "string",
-              minLength: cfg().loginMinLength,
-              maxLength: cfg().loginMaxLength,
-            },
-            password: {
-              type: "string",
-              nullable: true,
-              minLength: cfg().passwordMinLength,
-              maxLength: cfg().passwordMaxLength,
-            },
-          },
-        } satisfies JSONSchema,
-      },
-    }
-  }
-
   ///////////////////////////////////////////////////////////////////////////////
 
   #isAuthorized(login: string, token: string | undefined) {
@@ -100,19 +64,12 @@ export class Gate {
     return Boolean(maybeUser)
   }
 }
-export namespace Gate {
-  export interface Routes extends RequestGenericInterface {
-    "/connect": {
-      Body: {
-        login: string
-        token?: string
-      }
-    }
-    "/connect/auth": {
-      Body: {
-        login: string
-        password: string
-      }
+
+export interface GateRequests extends TypedReqestsMap {
+  "/gate/connect": {
+    Body: {
+      login: string
+      token?: string
     }
   }
 }
