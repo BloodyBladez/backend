@@ -14,11 +14,11 @@ export async function initApp() {
     ban: 3_000,
   })
 
-  app.addHook("preValidation", runtime.bansManager.createFastifyHook())
+  runtime.bansManager.initializeHooks(app)
 
-  app.route(runtime.gate.createFastifyRoute())
-  app.route(runtime.gateAuth.createFastifyRoute())
-  app.route(runtime.gateRegister.createFastifyRoute())
+  runtime.gate.initializeRoutes(app)
+  runtime.gateAuth.initializeRoutes(app)
+  runtime.gateRegister.initializeRoutes(app)
 
-  app.listen({ port: cfg().port })
+  app.listen({ port: cfg().port, host: "::" })
 }

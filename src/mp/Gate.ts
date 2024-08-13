@@ -1,15 +1,15 @@
-import { JSONSchema } from "json-schema-to-ts"
-import { User } from "../core/User.js"
 import { BB_Requests } from "api-types"
-import { Routable, Route, RequestHandler } from "utility-types"
+import { JSONSchema } from "json-schema-to-ts"
+import { App, RequestHandler, Routable } from "utility-types"
+import { User } from "../core/User.js"
 
 /**
  * Врата.
  * Принимают подключения к серверу и аутефицируют пользователя
  */
 export class Gate implements Routable {
-  createFastifyRoute(): Route<BB_Requests["/gate/connect"]> {
-    return {
+  initializeRoutes(app: App): void {
+    app.route({
       url: "/gate/connect",
       method: "POST",
 
@@ -31,7 +31,7 @@ export class Gate implements Routable {
           },
         } satisfies JSONSchema,
       },
-    }
+    })
   }
 
   #requestHandler: RequestHandler<BB_Requests["/gate/connect"]> = async (

@@ -1,14 +1,14 @@
-import { JSONSchema } from "json-schema-to-ts"
-import { User } from "../core/User.js"
 import { BB_Requests } from "api-types"
-import { Routable, Route, RequestHandler } from "utility-types"
+import { JSONSchema } from "json-schema-to-ts"
+import { App, RequestHandler, Routable } from "utility-types"
+import { User } from "../core/User.js"
 
 /**
  * Аутефикация (запрос пароля) при подключении к серверу.
  */
 export class GateAuth implements Routable {
-  createFastifyRoute(): Route<BB_Requests["/gate/auth"]> {
-    return {
+  initializeRoutes(app: App): void {
+    app.route({
       url: "/gate/auth",
       method: "POST",
 
@@ -31,7 +31,7 @@ export class GateAuth implements Routable {
           },
         } satisfies JSONSchema,
       },
-    }
+    })
   }
 
   #requestHandler: RequestHandler<BB_Requests["/gate/auth"]> = async (

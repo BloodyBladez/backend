@@ -1,22 +1,43 @@
 import {
-  FastifyRequest,
-  FastifyReply,
   FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
   RequestGenericInterface,
   RouteGenericInterface,
-  RouteOptions,
   RouteHandlerMethod,
+  RouteOptions,
 } from "fastify"
-import { Server, IncomingMessage, ServerResponse } from "http"
+import { IncomingMessage, Server, ServerResponse } from "http"
 
-export type Req = FastifyRequest
+export type Req<Generic extends RequestGenericInterface = unknown> =
+  FastifyRequest<Generic>
 export type Res = FastifyReply
 export type App = FastifyInstance
-export type TypedReqestsMap = Record<string, RequestGenericInterface>
+
+/**
+ * Роут. [Для чайников](https://qna.habr.com/q/360532)
+ */
 export type Route<Generic extends RouteGenericInterface = unknown> =
   RouteOptions<Server, IncomingMessage, ServerResponse, Generic>
+/**
+ * Функция/Метод, который(-ая) занимается обработкой самого запроса и выдачей ответа.
+ *
+ * Часть роута (`Route#handler`). **Если это метот - используйте `Function#bind`**
+ */
 export type RequestHandler<Generic extends RouteGenericInterface = unknown> =
   RouteHandlerMethod<Server, IncomingMessage, ServerResponse, Generic>
+
+/**
+ * Объект (класс), который может создавать роуты.
+ * Метод `initializeRoutes()` необходимо вызывать в главном файле сервера.
+ */
 export interface Routable {
-  createFastifyRoute(): Route
+  initializeRoutes(app: App): void
+}
+/**
+ * Объект (класс), который может создавать хуки.
+ * Метод `initializeHooks()` необходимо вызывать в главном файле сервера.
+ */
+export interface Hookable {
+  initializeHooks(app: App): void
 }

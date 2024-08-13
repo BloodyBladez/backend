@@ -1,13 +1,13 @@
 import { BB_Requests } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
-import { RequestHandler, Routable, Route } from "utility-types"
+import { App, RequestHandler, Routable } from "utility-types"
 
 /**
  * Регистрация (запрос пароля) аккаунта на публичных серверах.
  */
 export class GateRegister implements Routable {
-  createFastifyRoute(): Route<BB_Requests["/gate/register"]> {
-    return {
+  initializeRoutes(app: App): void {
+    app.route({
       url: "/gate/register",
       method: "POST",
 
@@ -30,7 +30,7 @@ export class GateRegister implements Routable {
           },
         } satisfies JSONSchema,
       },
-    }
+    })
   }
 
   #requestsHandler: RequestHandler<BB_Requests["/gate/register"]> = async (
