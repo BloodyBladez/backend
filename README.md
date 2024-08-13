@@ -2,4 +2,6 @@
 
 Server(Backend) for the BB game.
 
-# [Server API](./docs/API.md)
+# [Server API (ru)](./docs/API.md)
+
+# [Project file structure (ru)](./STRUCTURE.md)
