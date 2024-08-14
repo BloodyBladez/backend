@@ -5,7 +5,7 @@ import { User } from "../core/User.js"
 
 /**
  * Врата.
- * Принимают подключения к серверу и аутефицируют пользователя
+ * Принимают подключения к серверу и при необходимости запрашивают аутефикацию / регистрацию.
  */
 export class Gate implements Routable {
   initializeRoutes(app: App): void {
@@ -24,9 +24,10 @@ export class Gate implements Routable {
               minLength: cfg().loginMinLength,
               maxLength: cfg().loginMaxLength,
             },
-            token: {
+            userkey: {
               type: "string",
-              nullable: true,
+              minLength: 10,
+              maxLength: 1_000,
             },
           },
         } satisfies JSONSchema,
@@ -37,35 +38,34 @@ export class Gate implements Routable {
   #requestHandler: RequestHandler<BB_Requests["/gate/connect"]> = async (
     req,
     res
-  ) => {
-    const { login, token } = req.body
-    if (!this.#isAuthorized(login, token)) {
+  ): Promise<void> => {
+    const { login, userkey } = req.body
+    if (rt.bansManager.isBanned_byLogin(login))
+      return rt.bansManager.makeResponse(res, "login")
+    if (rt.bansManager.isBanned_byAccount(userkey))
+      return rt.bansManager.makeResponse(res, "account")
+
+    if (!this.#isAuthorized(login, userkey)) {
       if (cfg().isFriendOnly) return res.status(200)
-      return res
-        .status(401)
-        .header("Content-Type", "application/json; charset=utf-8")
-        .send({ firstTime: true })
+      else return res.status(401).send({ firstTime: true })
     } else {
       if (cfg().isFriendOnly) return res.status(200)
-      if (!this.#tokensAreMatch(login, token))
-        return res
-          .status(401)
-          .header("Content-Type", "application/json; charset=utf-8")
-          .send({ firstTime: false })
+      else if (!this.#userkeysAreMatch(login, userkey))
+        return res.status(401).send({ firstTime: false })
     }
   }
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  #isAuthorized(login: string, token: string | undefined) {
+  #isAuthorized(login: string, userkey: string | undefined) {
     const maybeUser = User.storage.find(
-      (it) => it.login == login || it.token == token
+      (it) => it.login == login || it.userkey == userkey
     )
     return Boolean(maybeUser)
   }
-  #tokensAreMatch(login: string, token: string) {
+  #userkeysAreMatch(login: string, userkey: string) {
     const maybeUser = User.storage.find(
-      (it) => it.login == login && it.token == token
+      (it) => it.login == login && it.userkey == userkey
     )
     return Boolean(maybeUser)
   }
