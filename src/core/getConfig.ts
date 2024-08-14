@@ -5,12 +5,28 @@ import path from "path"
 let configInstance: ServerConfig
 
 export interface ServerConfig {
+  /**
+   * Порт сервера.
+   */
   port: number
+  /**
+   * Является ли сервер дружеским?
+   *
+   * Влияет на аутефикацию, регистрацию и возможность запустить бой без лидера лобби
+   */
   isFriendOnly: boolean
+  /** Технический лимит. @internal */
   loginMinLength: number
+  /** Технический лимит. @internal */
   loginMaxLength: number
+  /** Технический лимит. @internal */
   passwordMinLength: number
+  /** Технический лимит. @internal */
   passwordMaxLength: number
+  /**
+   * Максимальное кол-во попыток пройти аутефикацию.
+   */
+  maxAuthTries: number
 }
 
 export function initConfig(): void {
@@ -39,6 +55,7 @@ function getDefaultConfig(): ServerConfig {
     loginMaxLength: 20,
     passwordMinLength: 3,
     passwordMaxLength: 20,
+    maxAuthTries: 3,
   }
 }
 function readConfig(): string | null {

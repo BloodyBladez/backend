@@ -1,3 +1,5 @@
+import { User } from "./core/User.js"
+
 export const detailedErrors = true
 
 export const Errors = {

@@ -6,7 +6,7 @@ import * as crypto from "crypto"
  */
 export class AuthSecret {
   /**
-   * MVP. Не реализовано в полной мере.
+   * TODO. Не реализовано в полной мере.
    */
   createAccountKey(): string {
     return crypto.randomUUID()

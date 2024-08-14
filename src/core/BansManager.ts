@@ -1,30 +1,25 @@
-import { App, Hookable, Req, Res } from "utility-types"
+import { App, Hookable, Res } from "utility-types"
+
+export type BanType = "ip" | "account" | "login"
 
 /**
  * Блокировки пользователей и аккаунтов.
  * @singleton
  */
 export class BansManager implements Hookable {
-  initializeHooks(app: App): void {
-    app.addHook("preParsing", (req) => this.isBanned_byIP(req.ip))
-    app.addHook("preHandler", this.isBanned_byAccount.bind(this))
-  }
-
-  isBanned(req: Req): boolean {
+  /**
+   * Блокирует пользователя по его ключу.
+   *
+   * @returns `true` если удалось заблокировать пользователя
+   */
+  banAccount(userkey: string): boolean {
     return false //ЗАГЛУШКА
   }
 
   /**
    * @returns `true` если удалось заблокировать пользователя
    */
-  createIPBan(ip: string): boolean {
-    return false //ЗАГЛУШКА
-  }
-
-  /**
-   * @returns `true` если удалось заблокировать пользователя
-   */
-  createBan(userUserkey: string): boolean {
+  createBan(subject: string, banType: BanType): boolean {
     return false //ЗАГЛУШКА
   }
 
@@ -33,7 +28,7 @@ export class BansManager implements Hookable {
    *
    * Код состояния: `423 Locked`
    */
-  makeResponse(res: Res, banType: "ip" | "account" | "login"): void {
+  makeResponse(res: Res, banType: BanType): void {
     res.status(423).send({ banType })
   }
 
@@ -67,5 +62,10 @@ export class BansManager implements Hookable {
   constructor() {
     this.#instance ??= new BansManager()
     return this.#instance
+  }
+
+  initializeHooks(app: App): void {
+    app.addHook("preParsing", (req) => this.isBanned_byIP(req.ip))
+    app.addHook("preHandler", this.isBanned_byAccount.bind(this))
   }
 }

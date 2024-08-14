@@ -1,3 +1,4 @@
+import { AuthSecret } from "./core/AuthSecret.js"
 import { BansManager } from "./core/BansManager.js"
 import { initConfig } from "./core/getConfig.js"
 import { Gate } from "./mp/Gate.js"
@@ -5,6 +6,7 @@ import { GateAuth } from "./mp/GateAuth.js"
 import { GateRegister } from "./mp/GateRegister.js"
 initConfig()
 
+export const authSecret = new AuthSecret()
 export const bansManager = new BansManager()
 
 export const gate = new Gate()

@@ -45,14 +45,13 @@ export class Gate implements Routable {
     if (rt.bansManager.isBanned_byAccount(userkey))
       return rt.bansManager.makeResponse(res, "account")
 
-    if (!this.#isAuthorized(login, userkey)) {
-      if (cfg().isFriendOnly) return res.status(200)
-      else return res.status(401).send({ firstTime: true })
-    } else {
-      if (cfg().isFriendOnly) return res.status(200)
-      else if (!this.#userkeysAreMatch(login, userkey))
-        return res.status(401).send({ firstTime: false })
-    }
+    if (cfg().isFriendOnly) return res.status(200)
+
+    if (!this.#isAuthorized(login, userkey))
+      return res.status(401).send({ firstTime: true })
+    else if (!this.#userkeysAreMatch(login, userkey))
+      return res.status(401).send({ firstTime: false })
+    else return res.status(200)
   }
 
   ///////////////////////////////////////////////////////////////////////////////

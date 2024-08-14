@@ -37,12 +37,32 @@ export class GateAuth implements Routable {
   #requestHandler: RequestHandler<BB_Requests["/gate/auth"]> = async (
     req,
     res
-  ) => {}
+  ): Promise<void> => {
+    const { login, password } = req.body
+    let tries = this.#tries.get(login) ?? cfg().maxAuthTries
+
+    if (tries == cfg().maxAuthTries) {
+      rt.bansManager.createBan(req.ip, "ip")
+      rt.bansManager.createBan(login, "login")
+      return res.status(406).send({ availableTries: 0 })
+    }
+
+    if (!this.#checkPassword(login, password)) {
+      tries--
+      this.#tries.set(login, tries)
+      return res.status(406).send({ availableTries: tries })
+    }
+
+    this.#tries.delete(login)
+    const userkey = rt.authSecret.createAccountKey()
+    User.create({ login, userkey, password })
+    return res.status(200).send({ userkey })
+  }
 
   ///////////////////////////////////////////////////////////////////////////////
 
   /** Кол-во попыток войти в аккаунт */
-  #tries = 0
+  #tries = new Map<string, number>() //login => tries
 
   #checkPassword(login: string, password: string) {
     const user = User.storage.find(

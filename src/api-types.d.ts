@@ -1,4 +1,4 @@
-import { RequestGenericInterface } from "fastify"
+import { RouteGenericInterface } from "fastify"
 
 export interface BB_Requests extends TypedReqestsMap {
   "/gate/connect": {
@@ -21,4 +21,4 @@ export interface BB_Requests extends TypedReqestsMap {
   }
 }
 
-type TypedReqestsMap = Record<string, RequestGenericInterface>
+type TypedReqestsMap = Record<string, RouteGenericInterface>
