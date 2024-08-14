@@ -5,7 +5,7 @@ import { User } from "../core/User.js"
 
 /**
  * Врата.
- * Принимают подключения к серверу и аутефицируют пользователя
+ * Принимают подключения к серверу и при необходимости запрашивают аутефикацию / регистрацию.
  */
 export class Gate implements Routable {
   initializeRoutes(app: App): void {

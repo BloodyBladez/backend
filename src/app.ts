@@ -2,7 +2,6 @@ import fastify from "fastify"
 import { Game } from "./game/Game.js"
 
 await import("./globals.js")
-const runtime = await import("./runtime.js")
 
 export async function initApp() {
   const game = new Game()
@@ -14,11 +13,11 @@ export async function initApp() {
     ban: 3_000,
   })
 
-  runtime.bansManager.initializeHooks(app)
+  rt.bansManager.initializeHooks(app)
 
-  runtime.gate.initializeRoutes(app)
-  runtime.gateAuth.initializeRoutes(app)
-  runtime.gateRegister.initializeRoutes(app)
+  rt.gate.initializeRoutes(app)
+  rt.gateAuth.initializeRoutes(app)
+  rt.gateRegister.initializeRoutes(app)
 
   app.listen({ port: cfg().port, host: "::" })
 }
