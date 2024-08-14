@@ -26,7 +26,8 @@ export class Gate implements Routable {
             },
             token: {
               type: "string",
-              nullable: true,
+              minLength: 10,
+              maxLength: 1_000,
             },
           },
         } satisfies JSONSchema,
@@ -37,21 +38,20 @@ export class Gate implements Routable {
   #requestHandler: RequestHandler<BB_Requests["/gate/connect"]> = async (
     req,
     res
-  ) => {
+  ): Promise<void> => {
     const { login, token } = req.body
+    if (rt.bansManager.isBanned_byLogin(login))
+      return rt.bansManager.makeResponse(res, "login")
+    if (rt.bansManager.isBanned_byAccount(token))
+      return rt.bansManager.makeResponse(res, "account")
+
     if (!this.#isAuthorized(login, token)) {
       if (cfg().isFriendOnly) return res.status(200)
-      return res
-        .status(401)
-        .header("Content-Type", "application/json; charset=utf-8")
-        .send({ firstTime: true })
+      else return res.status(401).send({ firstTime: true })
     } else {
       if (cfg().isFriendOnly) return res.status(200)
-      if (!this.#tokensAreMatch(login, token))
-        return res
-          .status(401)
-          .header("Content-Type", "application/json; charset=utf-8")
-          .send({ firstTime: false })
+      else if (!this.#tokensAreMatch(login, token))
+        return res.status(401).send({ firstTime: false })
     }
   }
 
