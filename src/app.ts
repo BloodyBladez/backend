@@ -18,6 +18,7 @@ export async function initApp() {
   rt.gate.initializeRoutes(app)
   rt.gateAuth.initializeRoutes(app)
   rt.gateRegister.initializeRoutes(app)
+  rt.apiVersion.initializeRoutes(app)
 
   app.listen({ port: cfg().port, host: "::" })
 }
