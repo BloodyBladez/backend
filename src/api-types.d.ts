@@ -4,7 +4,7 @@ export interface BB_Requests extends TypedReqestsMap {
   "/gate/connect": {
     Body: {
       login: string
-      token?: string
+      userkey?: string
     }
   }
   "/gate/auth": {

@@ -24,7 +24,7 @@ export class Gate implements Routable {
               minLength: cfg().loginMinLength,
               maxLength: cfg().loginMaxLength,
             },
-            token: {
+            userkey: {
               type: "string",
               minLength: 10,
               maxLength: 1_000,
@@ -39,33 +39,33 @@ export class Gate implements Routable {
     req,
     res
   ): Promise<void> => {
-    const { login, token } = req.body
+    const { login, userkey } = req.body
     if (rt.bansManager.isBanned_byLogin(login))
       return rt.bansManager.makeResponse(res, "login")
-    if (rt.bansManager.isBanned_byAccount(token))
+    if (rt.bansManager.isBanned_byAccount(userkey))
       return rt.bansManager.makeResponse(res, "account")
 
-    if (!this.#isAuthorized(login, token)) {
+    if (!this.#isAuthorized(login, userkey)) {
       if (cfg().isFriendOnly) return res.status(200)
       else return res.status(401).send({ firstTime: true })
     } else {
       if (cfg().isFriendOnly) return res.status(200)
-      else if (!this.#tokensAreMatch(login, token))
+      else if (!this.#userkeysAreMatch(login, userkey))
         return res.status(401).send({ firstTime: false })
     }
   }
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  #isAuthorized(login: string, token: string | undefined) {
+  #isAuthorized(login: string, userkey: string | undefined) {
     const maybeUser = User.storage.find(
-      (it) => it.login == login || it.token == token
+      (it) => it.login == login || it.userkey == userkey
     )
     return Boolean(maybeUser)
   }
-  #tokensAreMatch(login: string, token: string) {
+  #userkeysAreMatch(login: string, userkey: string) {
     const maybeUser = User.storage.find(
-      (it) => it.login == login && it.token == token
+      (it) => it.login == login && it.userkey == userkey
     )
     return Boolean(maybeUser)
   }

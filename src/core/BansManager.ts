@@ -2,6 +2,7 @@ import { App, Hookable, Req, Res } from "utility-types"
 
 /**
  * Блокировки пользователей и аккаунтов.
+ * @singleton
  */
 export class BansManager implements Hookable {
   initializeHooks(app: App): void {
@@ -23,7 +24,7 @@ export class BansManager implements Hookable {
   /**
    * @returns `true` если удалось заблокировать пользователя
    */
-  createBan(userToken: string): boolean {
+  createBan(userUserkey: string): boolean {
     return false //ЗАГЛУШКА
   }
 
@@ -46,9 +47,9 @@ export class BansManager implements Hookable {
   }
 
   /**
-   * Заблокировн ли пользователь **по аккаунту (ТОКЕНУ)**?
+   * Заблокировн ли пользователь **по аккаунту (КЛЮЧУ)**?
    */
-  isBanned_byAccount(token: string): boolean {
+  isBanned_byAccount(userkey: string): boolean {
     return false //ЗАГЛУШКА
   }
 
@@ -60,5 +61,11 @@ export class BansManager implements Hookable {
    */
   isBanned_byLogin(login: string): boolean {
     return false //ЗАГЛУШКА
+  }
+
+  #instance: BansManager
+  constructor() {
+    this.#instance ??= new BansManager()
+    return this.#instance
   }
 }

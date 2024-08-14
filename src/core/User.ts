@@ -7,7 +7,7 @@ import path from "path"
 export class User {
   /** username */
   login: string
-  token: string
+  userkey: string
   password: string | null
 
   static readonly storage = ArrayStorage.create<User.StoredData>(
@@ -15,5 +15,5 @@ export class User {
   )
 }
 export namespace User {
-  export type StoredData = Pick<User, "login" | "password" | "token">
+  export type StoredData = Pick<User, "login" | "password" | "userkey">
 }
