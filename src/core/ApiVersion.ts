@@ -1,5 +1,5 @@
 import { readFileSync } from "fs"
-import { join } from "path"
+import path from "path"
 import { BB_Requests } from "api-types"
 import { App, RequestHandler, Routable } from "utility-types"
 
@@ -17,7 +17,7 @@ export class ApiVersion implements Routable {
     req,
     res
   ) => {
-    const packageJsonPath = join(__dirname, "../../package.json")
+    const packageJsonPath = path.join(".", "package.json")
     this.#packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"))
     return res.send({
       apiVersion: this.#packageJson.apiVersion,
