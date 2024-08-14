@@ -19,7 +19,6 @@ export interface BB_Requests extends TypedReqestsMap {
       password: string
     }
   }
-  "/apiVersion": {}
 }
 
 type TypedReqestsMap = Record<string, RequestGenericInterface>
