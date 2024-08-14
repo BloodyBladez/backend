@@ -8,7 +8,6 @@ export class ApiVersion implements Routable {
     app.route({
       url: "/apiVersion",
       method: "GET",
-
       handler: this.#requestHandler.bind(this),
     })
   }
@@ -17,13 +16,25 @@ export class ApiVersion implements Routable {
     req,
     res
   ) => {
-    const packageJsonPath = path.join(".", "package.json")
-    this.#packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"))
     return res.send({
-      apiVersion: this.#packageJson.apiVersion,
-      gameVersion: this.#packageJson.gameVersion,
+      apiVersion: this.#apiVersion,
+      gameVersion: this.#gameVersion,
     })
   }
 
-  #packageJson: any
+  ///////////////////////////////////////////////////////////////////////////////
+
+  constructor() {
+    this.#loadVersions()
+  }
+
+  #loadVersions(): void {
+    const packageJsonPath = path.join(".", "package.json")
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"))
+    this.#apiVersion = packageJson["apiVersion"]
+    this.#gameVersion = packageJson["gameVersion"]
+  }
+
+  #apiVersion: string
+  #gameVersion: string
 }
