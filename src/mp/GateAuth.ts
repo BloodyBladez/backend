@@ -54,7 +54,12 @@ export class GateAuth implements Routable {
     }
 
     this.#tries.delete(login)
-    const userkey = rt.authSecret.createAccountKey()
+    const userkey = User.storage.find((it) => it.login == login)?.userkey
+    if (!userkey) {
+      Errors.GateAuth.userDoesNotExist(login)
+      return res.status(500).send(Errors.GateAuth.youDoNotExist())
+    }
+
     User.create({ login, userkey, password })
     return res.status(200).send({ userkey })
   }
