@@ -41,6 +41,7 @@ export class User {
     if (maybeExistsData) this.data = maybeExistsData
     else {
       const index = User.storage.push(data) - 1
+      User.storage.save()
       this.data = User.storage[index]
     }
   }

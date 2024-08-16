@@ -39,18 +39,18 @@ export class GateAuth implements Routable {
     res
   ): Promise<void> => {
     const { login, password } = req.body
-    let tries = this.#tries.get(login) ?? cfg().maxAuthTries
+    let availableTries = this.#tries.get(login) ?? cfg().maxAuthTries
 
-    if (tries == cfg().maxAuthTries) {
+    if (availableTries == 0) {
       rt.bansManager.createBan(req.ip, "ip")
       rt.bansManager.createBan(login, "login")
       return res.status(406).send({ availableTries: 0 })
     }
 
     if (!this.#checkPassword(login, password)) {
-      tries--
-      this.#tries.set(login, tries)
-      return res.status(406).send({ availableTries: tries })
+      availableTries--
+      this.#tries.set(login, availableTries)
+      return res.status(406).send({ availableTries })
     }
 
     this.#tries.delete(login)

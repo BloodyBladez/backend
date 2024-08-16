@@ -1,5 +1,6 @@
 import fastify from "fastify"
 import { Game } from "./game/Game.js"
+import { fastifyRateLimit } from "@fastify/rate-limit"
 
 await import("./globals.js")
 
@@ -8,15 +9,16 @@ console.log(Messages.serverIsPreparing())
 const game = new Game()
 const app = fastify({
   logger: {
-    level: "error",
+    level: "info",
     stream: process.stdout,
   },
 })
 
-app.register(import("@fastify/rate-limit"), {
-  max: 20,
-  timeWindow: 1000,
+await app.register(fastifyRateLimit, {
+  max: 10,
+  timeWindow: "1s",
   ban: 3_000,
+  hook: "preParsing",
 })
 
 rt.bansManager.initializeHooks(app)
