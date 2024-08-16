@@ -6,6 +6,7 @@ export const detailedErrors = true
  * Иначе - просто выдаём `error` в консоль.
  */
 export const Errors = {
+  unexcepted: (err: unknown) => `НЕИЗВЕСТНАЯ ОШИБКА:\n${err}`,
   GateRegister: {
     userAlreadyRegistred: (login: string, ip: string) =>
       console.debug(
@@ -35,4 +36,13 @@ export const Errors = {
           : ""
       ),
   },
+}
+
+/**
+ * Сообщения (не ошибки и предупреждения), для администраторов сервера
+ */
+export const Messages = {
+  serverIsPreparing: () => `Сервер запускается...`,
+  serverIsReady: (host: string) =>
+    `Сервер успешно запущен!\n\tЗайти: ${host}/gate/connect \n\tАдмин-панель: <отсутствует>`,
 }

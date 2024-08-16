@@ -6,13 +6,13 @@ import { App, RequestHandler, Routable } from "utility-types"
 export class ApiVersion implements Routable {
   initializeRoutes(app: App): void {
     app.route({
-      url: "/apiVersion",
+      url: "/api-version",
       method: "GET",
       handler: this.#requestHandler.bind(this),
     })
   }
 
-  #requestHandler: RequestHandler<BB_Requests["/apiVersion"]> = async (
+  #requestHandler: RequestHandler<BB_Requests["/api-version"]> = async (
     req,
     res
   ) => {

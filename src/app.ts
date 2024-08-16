@@ -3,22 +3,41 @@ import { Game } from "./game/Game.js"
 
 await import("./globals.js")
 
-export async function initApp() {
-  const game = new Game()
-  const app = fastify()
+console.log(Messages.serverIsPreparing())
 
-  app.register(import("@fastify/rate-limit"), {
-    max: 20,
-    timeWindow: 1000,
-    ban: 3_000,
+const game = new Game()
+const app = fastify({
+  logger: {
+    serializers: {
+      req: function (req) {
+        return { url: req.url }
+      },
+    },
+    level: "info",
+    stream: process.stdout,
+  },
+})
+
+app.register(import("@fastify/rate-limit"), {
+  max: 20,
+  timeWindow: 1000,
+  ban: 3_000,
+})
+
+rt.bansManager.initializeHooks(app)
+
+rt.gate.initializeRoutes(app)
+rt.gateAuth.initializeRoutes(app)
+rt.gateRegister.initializeRoutes(app)
+rt.apiVersion.initializeRoutes(app)
+
+app
+  .listen({
+    port: cfg().port,
   })
+  .catch((err) => {
+    throw Errors.unexcepted(err)
+  })
+  .then((address) => console.log(Messages.serverIsReady(address)))
 
-  rt.bansManager.initializeHooks(app)
-
-  rt.gate.initializeRoutes(app)
-  rt.gateAuth.initializeRoutes(app)
-  rt.gateRegister.initializeRoutes(app)
-  rt.apiVersion.initializeRoutes(app)
-
-  app.listen({ port: cfg().port, host: "::" })
-}
+app.log

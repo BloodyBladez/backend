@@ -1,4 +1,4 @@
-import { ArrayStorage } from "@eds-fw/storage"
+const { ArrayStorage } = await import("@eds-fw/storage")
 import path from "path"
 
 /**

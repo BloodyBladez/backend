@@ -1,6 +1,7 @@
 import { accessSync, mkdirSync, readFileSync, writeFileSync } from "fs"
 import * as ini from "ini"
 import path from "path"
+import { Callable } from "utility-types"
 
 let configInstance: ServerConfig
 
@@ -28,13 +29,24 @@ export interface ServerConfig {
    */
   maxAuthTries: number
 }
+const ConfigRuntimeTypes: Record<keyof ServerConfig, Callable> = {
+  port: Number,
+  isFriendOnly: Boolean,
+  loginMinLength: Number,
+  loginMaxLength: Number,
+  passwordMinLength: Number,
+  passwordMaxLength: Number,
+  maxAuthTries: Number,
+}
 
 export function initConfig(): void {
   const content = readConfig()
   if (content === null) configInstance = getDefaultConfig()
   else
     try {
-      configInstance = { ...getDefaultConfig(), ...ini.parse(content) }
+      const parsed = ini.parse(content)
+      const typed = resolveConfigPropTypes(parsed)
+      configInstance = { ...getDefaultConfig(), ...typed }
     } catch (err) {
       throw Errors.getConfig.parseError(err)
     }
@@ -74,4 +86,10 @@ function createConfig(filePath: string, content: string): void {
   const parentPath = path.dirname(filePath)
   mkdirSync(parentPath, { recursive: true })
   writeFileSync(filePath, content)
+}
+function resolveConfigPropTypes(config: object): ServerConfig {
+  const keys = Object.getOwnPropertyNames(config)
+  return Object.fromEntries(
+    keys.map((key) => [key, ConfigRuntimeTypes[key](config[key])])
+  ) as ServerConfig
 }

@@ -2,6 +2,7 @@ import { ServerConfig } from "./core/getConfig.ts"
 
 declare global {
   export const Errors: typeof import("./messages.ts").Errors
+  export const Messages: typeof import("./messages.ts").Messages
   /**
    * Получить текущий конфиг сервера.
    * Если что, функция оптимизирована и не вызывает I/O нагрузок.

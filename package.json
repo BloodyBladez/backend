@@ -3,7 +3,7 @@
   "gameVersion": "1",
   "type": "module",
   "dependencies": {
-    "@eds-fw/storage": "^2.1.1",
+    "@eds-fw/storage": "^3.0.2",
     "@fastify/rate-limit": "^9.1.0",
     "body-parser": "^1.20.2",
     "fastify": "^4.28.1",

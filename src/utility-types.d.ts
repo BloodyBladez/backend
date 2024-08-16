@@ -41,3 +41,6 @@ export interface Routable {
 export interface Hookable {
   initializeHooks(app: App): void
 }
+
+export type Constructable = new (...params: unknown[]) => unknown
+export type Callable = (...params: unknown[]) => unknown
