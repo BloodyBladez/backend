@@ -9,6 +9,7 @@ export class ApiVersion implements Routable {
       url: "/api-version",
       method: "GET",
       handler: this.#requestHandler.bind(this),
+      schema: {},
     })
   }
 

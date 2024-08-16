@@ -8,12 +8,7 @@ console.log(Messages.serverIsPreparing())
 const game = new Game()
 const app = fastify({
   logger: {
-    serializers: {
-      req: function (req) {
-        return { url: req.url }
-      },
-    },
-    level: "info",
+    level: "error",
     stream: process.stdout,
   },
 })
@@ -34,10 +29,9 @@ rt.apiVersion.initializeRoutes(app)
 app
   .listen({
     port: cfg().port,
+    host: "::",
   })
   .catch((err) => {
     throw Errors.unexcepted(err)
   })
   .then((address) => console.log(Messages.serverIsReady(address)))
-
-app.log

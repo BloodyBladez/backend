@@ -59,7 +59,9 @@ export class BansManager implements Hookable {
   }
 
   initializeHooks(app: App): void {
+    /*
     app.addHook("preParsing", (req) => this.isBanned_byIP(req.ip))
     app.addHook("preHandler", this.isBanned_byAccount.bind(this))
+*/
   }
 }
