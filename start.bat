@@ -1,3 +1,3 @@
 @color 0b
-@node ./dist/index.js
+@node ./dist/app.js
 @pause

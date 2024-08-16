@@ -1,5 +1,5 @@
 {
-  "exclude": ["./dist/", "./node_modules/"],
+  "exclude": ["./dist/**", "./node_modules/**"],
   "compilerOptions": {
     "allowJs": true,
     "alwaysStrict": true,
@@ -10,6 +10,10 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ESNext"]
+    "lib": ["ESNext"],
+    "paths": {
+      "utility-types": ["./src/utility-types.d.ts"],
+      "api-types": ["./src/api-types.d.ts"]
+    }
   }
 }

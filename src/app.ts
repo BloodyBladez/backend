@@ -1,41 +1,39 @@
-import { IncomingMessage, createServer } from "http";
-import { WebSocketServer, MessageEvent } from "ws";
-import { KnownEvents } from "./types.js";
+import fastify from "fastify"
+import { Game } from "./game/Game.js"
+import { fastifyRateLimit } from "@fastify/rate-limit"
 
-type EventHandler = (msg: MessageEvent) => unknown;
+await import("./globals.js")
 
-const eventsMap: Partial<Record<KnownEvents, EventHandler>> = {};
+console.log(Messages.serverIsPreparing())
 
-export function registerEvent(event: KnownEvents, handler: EventHandler) {
-  if (eventsMap[event]) console.warn(`Overriding event '${event}' listener`);
-  eventsMap[event] = handler;
-}
+const game = new Game()
+const app = fastify({
+  logger: {
+    level: "info",
+    stream: process.stdout,
+  },
+})
 
-export function initApp(port: number) {
-  const rawNodeServer = createServer();
-  const wsServer = new WebSocketServer({ server: rawNodeServer });
-  wsServer.on("connection", async (ws, req) => {
-    ws.onmessage = handleWSMessage.bind({});
-    ws.on("error", (error) => ws.send(error.stack));
-  });
-}
+await app.register(fastifyRateLimit, {
+  max: 10,
+  timeWindow: "1s",
+  ban: 3_000,
+  hook: "preParsing",
+})
 
-async function handleWSMessage(
-  ws: WebSocket,
-  req: IncomingMessage,
-  event: MessageEvent
-) {
-  switch (event.type as KnownEvents) {
-    case "createLobby_v1":
-      return;
-    case "joinLobby_v1":
-      return;
-    case "leaveLobby_v1":
-      return;
-    default:
-      ws.send(
-        `Error: Unknown event: '${event.type}'. Maybe the server is out of date?`
-      );
-      return;
-  }
-}
+rt.bansManager.initializeHooks(app)
+
+rt.gate.initializeRoutes(app)
+rt.gateAuth.initializeRoutes(app)
+rt.gateRegister.initializeRoutes(app)
+rt.apiVersion.initializeRoutes(app)
+
+app
+  .listen({
+    port: cfg().port,
+    host: "::",
+  })
+  .catch((err) => {
+    throw Errors.unexcepted(err)
+  })
+  .then((address) => console.log(Messages.serverIsReady(address)))
