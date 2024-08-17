@@ -1,4 +1,4 @@
-import { BB_Requests } from "api-types"
+import { ApiTypes } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
 import { App, RequestHandler, Routable } from "utility-types"
 import { User } from "../core/User.js"
@@ -35,7 +35,7 @@ export class GateAuth implements Routable {
     })
   }
 
-  #requestHandler: RequestHandler<BB_Requests["/gate/auth"]> = async (
+  #requestHandler: RequestHandler<ApiTypes["/gate/auth"]> = async (
     req,
     res
   ): Promise<void> => {

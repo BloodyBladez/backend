@@ -1,6 +1,6 @@
 import { readFileSync } from "fs"
 import path from "path"
-import { BB_Requests } from "api-types"
+import { ApiTypes } from "api-types"
 import { App, RequestHandler, Routable } from "utility-types"
 
 export class ApiVersion implements Routable {
@@ -13,7 +13,7 @@ export class ApiVersion implements Routable {
     })
   }
 
-  #requestHandler: RequestHandler<BB_Requests["/api-version"]> = async (
+  #requestHandler: RequestHandler<ApiTypes["/api-version"]> = async (
     req,
     res
   ) => {
