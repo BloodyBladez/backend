@@ -4,6 +4,8 @@ import path from "path"
 import { Callable } from "utility-types"
 
 let configInstance: ServerConfig
+const relativeFilePath = path.join(".", "bb-config.ini")
+const filePath = path.resolve(relativeFilePath)
 
 export interface ServerConfig {
   /**
@@ -47,6 +49,7 @@ export function initConfig(): void {
       const parsed = ini.parse(content)
       const typed = resolveConfigPropTypes(parsed)
       configInstance = { ...getDefaultConfig(), ...typed }
+      createConfig(filePath, ini.stringify(configInstance))
     } catch (err) {
       throw Errors.getConfig.parseError(err)
     }
@@ -71,9 +74,6 @@ function getDefaultConfig(): ServerConfig {
   }
 }
 function readConfig(): string | null {
-  const relativeFilePath = path.join(".", "bb-config.ini")
-  const filePath = path.resolve(relativeFilePath)
-
   try {
     accessSync(filePath)
     return readFileSync(filePath, "utf8")
