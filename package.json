@@ -1,6 +1,6 @@
 {
   "apiVersion": "1",
-  "gameVersion": "1",
+  "gameVersion": "alpha-v0.1",
   "type": "module",
   "dependencies": {
     "@eds-fw/storage": "^3.0.2",

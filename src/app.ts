@@ -1,12 +1,10 @@
-import fastify from "fastify"
-import { Game } from "./game/Game.js"
 import { fastifyRateLimit } from "@fastify/rate-limit"
+import fastify from "fastify"
 
 await import("./globals.js")
 
 console.log(Messages.serverIsPreparing())
 
-const game = new Game()
 const app = fastify({
   logger: {
     level: "info",
