@@ -1,6 +1,6 @@
 import { App, Hookable, Res } from "utility-types"
 
-export type BanType = "ip" | "account" | "login"
+export type BanType = "ip" | "account"
 
 /**
  * Блокировки пользователей и аккаунтов.
@@ -45,16 +45,6 @@ export class BansManager implements Hookable {
    * Заблокировн ли пользователь **по аккаунту (КЛЮЧУ)**?
    */
   isBanned_byAccount(userkey: string): boolean {
-    return false //ЗАГЛУШКА
-  }
-
-  /**
-   * (особая)Блокировка по логину **(РЕДКОСТЬ)**.
-   * В данный момент используется только при логине
-   *
-   * Прошу обратить внимание: **не хукается**; вызывается вручную
-   */
-  isBanned_byLogin(login: string): boolean {
     return false //ЗАГЛУШКА
   }
 

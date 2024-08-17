@@ -2,6 +2,7 @@ import { BB_Requests } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
 import { App, RequestHandler, Routable } from "utility-types"
 import { User } from "../core/User.js"
+import { AuthSecret } from "../core/AuthSecret.js"
 
 /**
  * Врата.
@@ -40,14 +41,12 @@ export class Gate implements Routable {
     res
   ): Promise<void> => {
     const { login, userkey } = req.body
-    if (rt.bansManager.isBanned_byLogin(login))
-      return rt.bansManager.makeResponse(res, "login")
     if (rt.bansManager.isBanned_byAccount(userkey))
       return rt.bansManager.makeResponse(res, "account")
 
     if (cfg().isFriendOnly) return res.status(200).send()
 
-    if (!this.#isAuthorized(login, userkey))
+    if (!this.#isAuthorized(login))
       return res.status(401).send({ firstTime: true })
     else if (!this.#userkeysAreMatch(login, userkey))
       return res.status(401).send({ firstTime: false })
@@ -56,16 +55,14 @@ export class Gate implements Routable {
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  #isAuthorized(login: string, userkey: string | undefined) {
-    const maybeUser = User.storage.find(
-      (it) => it.login == login || it.userkey == userkey
-    )
+  #isAuthorized(login: string): boolean {
+    const maybeUser = User.storage.find((it) => it.login == login)
     return Boolean(maybeUser)
   }
-  #userkeysAreMatch(login: string, userkey: string) {
-    const maybeUser = User.storage.find(
-      (it) => it.login == login && it.userkey == userkey
-    )
-    return Boolean(maybeUser)
+  #userkeysAreMatch(login: string, userkey: string): boolean {
+    const maybeUser = User.storage.find((it) => it.login == login)
+    if (!maybeUser) return false
+    const maybeUserkey = AuthSecret.findUserkey(maybeUser.id)
+    return maybeUserkey == userkey
   }
 }

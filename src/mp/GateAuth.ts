@@ -2,6 +2,7 @@ import { BB_Requests } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
 import { App, RequestHandler, Routable } from "utility-types"
 import { User } from "../core/User.js"
+import { AuthSecret } from "../core/AuthSecret.js"
 
 /**
  * Аутефикация (запрос пароля) при подключении к серверу.
@@ -43,7 +44,6 @@ export class GateAuth implements Routable {
 
     if (availableTries == 0) {
       rt.bansManager.createBan(req.ip, "ip")
-      rt.bansManager.createBan(login, "login")
       return res.status(406).send({ availableTries: 0 })
     }
 
@@ -54,14 +54,19 @@ export class GateAuth implements Routable {
     }
 
     this.#tries.delete(login)
-    const userkey = User.storage.find((it) => it.login == login)?.userkey
+
+    const user = User.storage.find((it) => it.login == login)
+    if (!user) {
+      Errors.GateAuth.userDoesNotExist(login)
+      return res.status(500).send(Errors.GateAuth.youDoNotExist())
+    }
+    const userkey = AuthSecret.findUserkey(user.id)
     if (!userkey) {
       Errors.GateAuth.userDoesNotExist(login)
       return res.status(500).send(Errors.GateAuth.youDoNotExist())
     }
 
-    User.create({ login, userkey, password })
-    return res.status(200).send({ userkey })
+    return res.status(200).send({ userkey, userId: user.id })
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -70,9 +75,9 @@ export class GateAuth implements Routable {
   #tries = new Map<string, number>() //login => tries
 
   #checkPassword(login: string, password: string) {
-    const user = User.storage.find(
+    const maybeUser = User.storage.find(
       (it) => it.login == login && it.password == password
     )
-    return Boolean(user)
+    return Boolean(maybeUser)
   }
 }

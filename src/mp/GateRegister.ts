@@ -2,6 +2,7 @@ import { BB_Requests } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
 import { App, RequestHandler, Routable } from "utility-types"
 import { User } from "../core/User.js"
+import { AuthSecret } from "../core/AuthSecret.js"
 
 /**
  * Регистрация (запрос пароля) аккаунта на публичных серверах.
@@ -44,9 +45,13 @@ export class GateRegister implements Routable {
       return res.status(400).send(Errors.GateRegister.youAlreadyRegistred()) //хакеры идут вон
     }
 
-    const userkey = rt.authSecret.createAccountKey()
-    User.create({ login, userkey, password })
-    return res.status(200).send({ userkey })
+    const user = User.create({ login, password })
+    const userkey = AuthSecret.findUserkey(user.data.id)
+    if (!userkey) {
+      Errors.GateRegister.userDoesNotExist(login)
+      return res.status(500).send(Errors.GateRegister.youDoNotExist())
+    }
+    return res.status(200).send({ userId: user.data.id, userkey })
   }
 
   ///////////////////////////////////////////////////////////////////////////////
