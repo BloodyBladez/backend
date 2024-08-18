@@ -26,6 +26,10 @@ export interface ServerConfig {
   passwordMinLength: number
   /** Технический лимит. @internal */
   passwordMaxLength: number
+  /** Технический лимит. @internal */
+  lobbyNameMinLength: number
+  /** Технический лимит. @internal */
+  lobbyNameMaxLength: number
   /**
    * Максимальное кол-во попыток пройти аутефикацию.
    */
@@ -38,6 +42,8 @@ const ConfigRuntimeTypes: Record<keyof ServerConfig, Callable> = {
   loginMaxLength: Number,
   passwordMinLength: Number,
   passwordMaxLength: Number,
+  lobbyNameMinLength: Number,
+  lobbyNameMaxLength: Number,
   maxAuthTries: Number,
 }
 
@@ -70,6 +76,8 @@ function getDefaultConfig(): ServerConfig {
     loginMaxLength: 20,
     passwordMinLength: 3,
     passwordMaxLength: 20,
+    lobbyNameMinLength: 3,
+    lobbyNameMaxLength: 20,
     maxAuthTries: 3,
   }
 }
@@ -87,9 +95,11 @@ function createConfig(filePath: string, content: string): void {
   mkdirSync(parentPath, { recursive: true })
   writeFileSync(filePath, content)
 }
-function resolveConfigPropTypes(config: object): ServerConfig {
-  const keys = Object.getOwnPropertyNames(config)
+function resolveConfigPropTypes(
+  config: Partial<Record<keyof ServerConfig, unknown>>
+): ServerConfig {
+  const keys = Object.getOwnPropertyNames(config) as (keyof ServerConfig)[]
   return Object.fromEntries(
     keys.map((key) => [key, ConfigRuntimeTypes[key](config[key])])
-  ) as ServerConfig
+  ) as unknown as ServerConfig
 }

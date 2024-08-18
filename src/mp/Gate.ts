@@ -1,20 +1,20 @@
 import { ApiTypes } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
-import { App, RequestHandler, Routable } from "utility-types"
-import { User } from "../core/User.js"
+import { App, RequestHandler } from "utility-types"
 import { AuthSecret } from "../core/AuthSecret.js"
+import { User } from "../core/User.js"
 
 /**
  * Врата.
  * Принимают подключения к серверу и при необходимости запрашивают аутефикацию / регистрацию.
  */
-export class Gate implements Routable {
-  initializeRoutes(app: App): void {
+export class Gate {
+  static initializeRoutes(app: App): void {
     app.route({
       url: "/gate/connect",
       method: "POST",
 
-      handler: this.#requestHandler.bind(this),
+      handler: this.#requestHandler,
       schema: {
         body: {
           type: "object",
@@ -36,33 +36,32 @@ export class Gate implements Routable {
     })
   }
 
-  #requestHandler: RequestHandler<ApiTypes["/gate/connect"]> = async (
+  static #requestHandler: RequestHandler<ApiTypes["/gate/connect"]> = async (
     req,
     res
   ): Promise<void> => {
     const { login, userkey } = req.body
-    if (rt.bansManager.isBanned_byAccount(userkey))
-      return rt.bansManager.makeResponse(res, "account")
+
+    const userData = User.storage.find((it) => it.login == login)
+    if (!userData) return res.status(401).send({ firstTime: true })
 
     if (cfg().isFriendOnly) return res.status(200).send()
 
-    if (!this.#isAuthorized(login))
-      return res.status(401).send({ firstTime: true })
-    else if (!this.#userkeysAreMatch(login, userkey))
+    if (!userkey) return res.status(400).send()
+    if (!this.#userkeysAreMatch(login, userkey))
       return res.status(401).send({ firstTime: false })
-    else return res.status(200).send()
+
+    return res.status(200).send({ userId: userData.id })
   }
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  #isAuthorized(login: string): boolean {
-    const maybeUser = User.storage.find((it) => it.login == login)
-    return Boolean(maybeUser)
-  }
-  #userkeysAreMatch(login: string, userkey: string): boolean {
+  static #userkeysAreMatch(login: string, userkey: string): boolean {
     const maybeUser = User.storage.find((it) => it.login == login)
     if (!maybeUser) return false
     const maybeUserkey = AuthSecret.findUserkey(maybeUser.id)
     return maybeUserkey == userkey
   }
+
+  private constructor() {}
 }

@@ -1,4 +1,5 @@
 import { RouteGenericInterface } from "fastify"
+import { Lobby } from "./game/Lobby.ts"
 
 export interface ApiTypes extends TypedReqestsMap {
   "/api-version": {
@@ -58,40 +59,47 @@ export interface ApiTypes extends TypedReqestsMap {
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  "/lobbies-list/": {
-    Reply: {}
+  "/lobby-list/": {
+    Reply: {
+      lobbyList: Lobby.Data[]
+    }
   }
   "/lobby/refresh-data": {
-    Reply: {}
+    Reply?: Lobby.Data
   }
   "/lobby/create": {
     Body: {
       name: string
-      password?: string
+      password: string | null
       maxPlayers: number
+    }
+    Reply?: {
+      lobbyId: string
     }
   }
   "/lobby/update": {
-    Body: {
-      name?: string
-      password?: string
-      maxPlayers?: 2
-
-      leader?: string
-      removePlayers?: string[]
+    Body: Partial<Omit<Lobby.Data, "id">> & {
+      /** `userId[]` */
+      removeMembers?: string[]
     }
+    Reply?: Lobby.Data
   }
   "/lobby/join": {
+    Querystring: {
+      id: string
+    }
     Body: {
-      lobbyId: string
       password?: string
     }
+    Reply?: Lobby.Data
   }
   "/lobby/leave": {
-    Body: {
-      lobbyId: string
-    }
     Reply: undefined
+  }
+  "/lobby/launch-game": {
+    Reply?: {
+      gameId: string
+    }
   }
 }
 

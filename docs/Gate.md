@@ -74,7 +74,7 @@ body: {
 
 ```ts
 //Успешная регистрация
-status: 200 //OK
+status: 201 //Created
 body: {
   userkey: string
   userId: string

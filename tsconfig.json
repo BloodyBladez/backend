@@ -5,6 +5,7 @@
     "alwaysStrict": true,
     "checkJs": true,
     "importHelpers": true,
+    "strict": true,
     "rootDir": "./src/",
     "outDir": "./dist/",
     "target": "ESNext",
