@@ -7,6 +7,9 @@ import { Lobby } from "../game/Lobby.js"
 const MAX_SUPPORTED_LOBBY_MEMBERS = 2
 const MIN_SUPPORTED_LOBBY_MEMBERS = 2
 
+/**
+ * Управляет всеми лобби на сервере (логика запросов и ответов)
+ */
 export class LobbyManager {
   static initializeRoutes(app: App): void {
     app.route({

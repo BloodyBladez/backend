@@ -1,5 +1,6 @@
 import { RouteGenericInterface } from "fastify"
 import { Lobby } from "./game/Lobby.ts"
+import { User } from "./core/User.ts"
 
 export interface ApiTypes extends TypedReqestsMap {
   "/api-version": {
@@ -100,6 +101,15 @@ export interface ApiTypes extends TypedReqestsMap {
     Reply?: {
       gameId: string
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+
+  "/user/:id": {
+    Params: {
+      id: string
+    }
+    Reply?: Pick<User.Data, "id" | "login">
   }
 }
 

@@ -1,6 +1,9 @@
 import { randomBytes } from "crypto"
 import { User } from "../core/User.js"
 
+/**
+ * Само лобби. Существует исключительно в рантайме.
+ */
 export class Lobby {
   readonly data: Lobby.Data
 

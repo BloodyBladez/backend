@@ -7,6 +7,7 @@ import { GateAuth } from "./mp/GateAuth.js"
 import { GateRegister } from "./mp/GateRegister.js"
 import { LobbyManager } from "./mp/LobbyManager.js"
 import { User } from "./core/User.js"
+import { UserManager } from "./mp/UserManager.js"
 
 await import("./globals.js")
 
@@ -29,13 +30,14 @@ await app.register(fastifyRateLimit, {
 User.loadFromStorage()
 
 BansManager.initializeHooks(app)
-
 ApiVersion.initializeRoutes(app)
 
 Gate.initializeRoutes(app)
 GateAuth.initializeRoutes(app)
 GateRegister.initializeRoutes(app)
+
 LobbyManager.initializeRoutes(app)
+UserManager.initializeRoutes(app)
 
 app
   .listen({
