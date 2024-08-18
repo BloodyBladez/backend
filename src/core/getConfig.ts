@@ -4,6 +4,8 @@ import path from "path"
 import { Callable } from "utility-types"
 
 let configInstance: ServerConfig
+const relativeFilePath = path.join(".", "bb-config.ini")
+const filePath = path.resolve(relativeFilePath)
 
 export interface ServerConfig {
   /**
@@ -24,6 +26,10 @@ export interface ServerConfig {
   passwordMinLength: number
   /** Технический лимит. @internal */
   passwordMaxLength: number
+  /** Технический лимит. @internal */
+  lobbyNameMinLength: number
+  /** Технический лимит. @internal */
+  lobbyNameMaxLength: number
   /**
    * Максимальное кол-во попыток пройти аутефикацию.
    */
@@ -36,6 +42,8 @@ const ConfigRuntimeTypes: Record<keyof ServerConfig, Callable> = {
   loginMaxLength: Number,
   passwordMinLength: Number,
   passwordMaxLength: Number,
+  lobbyNameMinLength: Number,
+  lobbyNameMaxLength: Number,
   maxAuthTries: Number,
 }
 
@@ -47,6 +55,7 @@ export function initConfig(): void {
       const parsed = ini.parse(content)
       const typed = resolveConfigPropTypes(parsed)
       configInstance = { ...getDefaultConfig(), ...typed }
+      createConfig(filePath, ini.stringify(configInstance))
     } catch (err) {
       throw Errors.getConfig.parseError(err)
     }
@@ -67,13 +76,12 @@ function getDefaultConfig(): ServerConfig {
     loginMaxLength: 20,
     passwordMinLength: 3,
     passwordMaxLength: 20,
+    lobbyNameMinLength: 3,
+    lobbyNameMaxLength: 20,
     maxAuthTries: 3,
   }
 }
 function readConfig(): string | null {
-  const relativeFilePath = path.join(".", "bb-config.ini")
-  const filePath = path.resolve(relativeFilePath)
-
   try {
     accessSync(filePath)
     return readFileSync(filePath, "utf8")
@@ -87,9 +95,11 @@ function createConfig(filePath: string, content: string): void {
   mkdirSync(parentPath, { recursive: true })
   writeFileSync(filePath, content)
 }
-function resolveConfigPropTypes(config: object): ServerConfig {
-  const keys = Object.getOwnPropertyNames(config)
+function resolveConfigPropTypes(
+  config: Partial<Record<keyof ServerConfig, unknown>>
+): ServerConfig {
+  const keys = Object.getOwnPropertyNames(config) as (keyof ServerConfig)[]
   return Object.fromEntries(
     keys.map((key) => [key, ConfigRuntimeTypes[key](config[key])])
-  ) as ServerConfig
+  ) as unknown as ServerConfig
 }

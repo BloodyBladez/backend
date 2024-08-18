@@ -1,18 +1,19 @@
-import { BB_Requests } from "api-types"
+import { ApiTypes } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
-import { App, RequestHandler, Routable } from "utility-types"
+import { App, RequestHandler } from "utility-types"
 import { User } from "../core/User.js"
+import { AuthSecret } from "../core/AuthSecret.js"
 
 /**
  * Регистрация (запрос пароля) аккаунта на публичных серверах.
  */
-export class GateRegister implements Routable {
-  initializeRoutes(app: App): void {
+export class GateRegister {
+  static initializeRoutes(app: App): void {
     app.route({
       url: "/gate/register",
       method: "POST",
 
-      handler: this.#requestsHandler.bind(this),
+      handler: this.#requestsHandler,
       schema: {
         body: {
           type: "object",
@@ -34,7 +35,7 @@ export class GateRegister implements Routable {
     })
   }
 
-  #requestsHandler: RequestHandler<BB_Requests["/gate/register"]> = async (
+  static #requestsHandler: RequestHandler<ApiTypes["/gate/register"]> = async (
     req,
     res
   ) => {
@@ -44,15 +45,21 @@ export class GateRegister implements Routable {
       return res.status(400).send(Errors.GateRegister.youAlreadyRegistred()) //хакеры идут вон
     }
 
-    const userkey = rt.authSecret.createAccountKey()
-    User.create({ login, userkey, password })
-    return res.status(200).send({ userkey })
+    const user = User.create({ login, password })
+    const userkey = AuthSecret.findUserkey(user.data.id)
+    if (!userkey) {
+      Errors.GateRegister.userDoesNotExist(login)
+      return res.status(500).send(Errors.GateRegister.youDoNotExist())
+    }
+    return res.status(201).send({ userId: user.data.id, userkey })
   }
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  #isRegistred(login: string) {
+  static #isRegistred(login: string) {
     const maybeUser = User.storage.find((it) => it.login == login)
     return Boolean(maybeUser)
   }
+
+  private constructor() {}
 }

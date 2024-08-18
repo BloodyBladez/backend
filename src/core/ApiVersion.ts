@@ -1,19 +1,21 @@
+import { ApiTypes } from "api-types"
 import { readFileSync } from "fs"
 import path from "path"
-import { BB_Requests } from "api-types"
-import { App, RequestHandler, Routable } from "utility-types"
+import { App, RequestHandler } from "utility-types"
 
-export class ApiVersion implements Routable {
-  initializeRoutes(app: App): void {
+export class ApiVersion {
+  static initializeRoutes(app: App): void {
+    this.#loadVersions()
+
     app.route({
       url: "/api-version",
       method: "GET",
-      handler: this.#requestHandler.bind(this),
+      handler: this.#requestHandler,
       schema: {},
     })
   }
 
-  #requestHandler: RequestHandler<BB_Requests["/api-version"]> = async (
+  static #requestHandler: RequestHandler<ApiTypes["/api-version"]> = async (
     req,
     res
   ) => {
@@ -25,17 +27,15 @@ export class ApiVersion implements Routable {
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  constructor() {
-    this.#loadVersions()
-  }
+  private constructor() {}
 
-  #loadVersions(): void {
+  static #loadVersions(): void {
     const packageJsonPath = path.join(".", "package.json")
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"))
     this.#apiVersion = packageJson["apiVersion"]
     this.#gameVersion = packageJson["gameVersion"]
   }
 
-  #apiVersion: string
-  #gameVersion: string
+  static #apiVersion: string
+  static #gameVersion: string
 }

@@ -1,18 +1,20 @@
-import { BB_Requests } from "api-types"
+import { ApiTypes } from "api-types"
 import { JSONSchema } from "json-schema-to-ts"
-import { App, RequestHandler, Routable } from "utility-types"
+import { App, RequestHandler } from "utility-types"
+import { AuthSecret } from "../core/AuthSecret.js"
 import { User } from "../core/User.js"
+import { BansManager } from "../core/BansManager.js"
 
 /**
  * Аутефикация (запрос пароля) при подключении к серверу.
  */
-export class GateAuth implements Routable {
-  initializeRoutes(app: App): void {
+export class GateAuth {
+  static initializeRoutes(app: App): void {
     app.route({
       url: "/gate/auth",
       method: "POST",
 
-      handler: this.#requestHandler.bind(this),
+      handler: this.#requestHandler,
       schema: {
         body: {
           type: "object",
@@ -34,7 +36,7 @@ export class GateAuth implements Routable {
     })
   }
 
-  #requestHandler: RequestHandler<BB_Requests["/gate/auth"]> = async (
+  static #requestHandler: RequestHandler<ApiTypes["/gate/auth"]> = async (
     req,
     res
   ): Promise<void> => {
@@ -42,8 +44,7 @@ export class GateAuth implements Routable {
     let availableTries = this.#tries.get(login) ?? cfg().maxAuthTries
 
     if (availableTries == 0) {
-      rt.bansManager.createBan(req.ip, "ip")
-      rt.bansManager.createBan(login, "login")
+      BansManager.createBan(req.ip, "ip")
       return res.status(406).send({ availableTries: 0 })
     }
 
@@ -54,25 +55,32 @@ export class GateAuth implements Routable {
     }
 
     this.#tries.delete(login)
-    const userkey = User.storage.find((it) => it.login == login)?.userkey
+
+    const user = User.storage.find((it) => it.login == login)
+    if (!user) {
+      Errors.GateAuth.userDoesNotExist(login)
+      return res.status(500).send(Errors.GateAuth.youDoNotExist())
+    }
+    const userkey = AuthSecret.findUserkey(user.id)
     if (!userkey) {
       Errors.GateAuth.userDoesNotExist(login)
       return res.status(500).send(Errors.GateAuth.youDoNotExist())
     }
 
-    User.create({ login, userkey, password })
-    return res.status(200).send({ userkey })
+    return res.status(200).send({ userkey, userId: user.id })
   }
 
   ///////////////////////////////////////////////////////////////////////////////
 
   /** Кол-во попыток войти в аккаунт */
-  #tries = new Map<string, number>() //login => tries
+  static #tries = new Map<string, number>() //login => tries
 
-  #checkPassword(login: string, password: string) {
-    const user = User.storage.find(
+  static #checkPassword(login: string, password: string) {
+    const maybeUser = User.storage.find(
       (it) => it.login == login && it.password == password
     )
-    return Boolean(user)
+    return Boolean(maybeUser)
   }
+
+  private constructor() {}
 }

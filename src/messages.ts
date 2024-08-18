@@ -7,6 +7,24 @@ export const detailedErrors = true
  */
 export const Errors = {
   unexcepted: (err: unknown) => `НЕИЗВЕСТНАЯ ОШИБКА:\n${err}`,
+  incorrectServerWork: `Сервер работает некорректно, что может быть причиной большого количества багов.\n\tПожалуйста, обновите его до последней версии (см. https://github.com/BloodyBladez/backend/releases )`,
+
+  AuthSecret: {
+    userkeyNotFound: (login: string) =>
+      `Ключ (userkey) пользователя '${login}' не найден.\n\tВозможно, произошла рассинхронизация двух хранилищ вследствие ручного вмешательства (не трожьте всё в папке 'data/') ИЛИ багов в коде`,
+  },
+
+  User: {
+    userAlreadyExists: (login: string) =>
+      console.error(
+        `БАГ: Пользователь с логином '${login}' уже существует на сервере.\n\t${Errors.incorrectServerWork}`
+      ),
+    userNotFound: (userId: string) =>
+      console.error(
+        `БАГ: Пользователя с ID '${userId}' не существует.\n\t${Errors.incorrectServerWork}`
+      ),
+  },
+
   GateRegister: {
     userAlreadyRegistred: (login: string, ip: string) =>
       console.debug(
@@ -15,6 +33,13 @@ export const Errors = {
       ),
     youAlreadyRegistred: () =>
       `При натуральных обстоятельствах, попасть на страницу регистрации уже существующего аккаунта невозможно. Походу, кто-то остался без эксплоита ( ͡° ͜ʖ ͡°)`,
+    userDoesNotExist: (login: string) =>
+      console.warn(
+        `ПРЕДУПРЕЖДЕНИЕ: Странности при регистрации пользователя '${login}'` +
+          `\n\tНе удалось создать аккаунт.`
+      ),
+    /** Версия метода `userDoesNotExist` для клиента */
+    youDoNotExist: () => `ОШИБКА: Не удалось создать ваш аккаунт на сервере`,
   },
 
   GateAuth: {
@@ -25,13 +50,21 @@ export const Errors = {
       ),
     /** Версия метода `userDoesNotExist` для клиента */
     youDoNotExist: () =>
-      `Ошибка: Ваш аккаунт на сервере был удалён, пока вы пытались пройти аутефикацию.`,
+      `ОШИБКА: Ваш аккаунт на сервере не найден.\n\tВозможно, он был удалён, пока вы пытались пройти аутефикацию.`,
+  },
+
+  Lobby: {
+    alreadyDeleted: (name: string) =>
+      console.error(
+        `БАГ: Лобби '${name}' уже удалено ИЛИ не найдено (при попытке удалить его).\n\t${Errors.incorrectServerWork}`
+      ),
   },
 
   getConfig: {
     parseError: (err: unknown) =>
       new Error(
-        `ОШИБКА: Не удалось прочитать конфиг сервера.` + detailedErrors
+        `ФАТАЛЬНАЯ ОШИБКА: Не удалось прочитать конфиг сервера.` +
+        detailedErrors
           ? "\n\tПодробно: " + err
           : ""
       ),

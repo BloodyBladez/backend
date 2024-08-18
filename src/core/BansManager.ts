@@ -1,25 +1,25 @@
-import { App, Hookable, Res } from "utility-types"
+import { App, Res } from "utility-types"
 
-export type BanType = "ip" | "account" | "login"
+export type BanType = "ip" | "account"
 
 /**
  * Блокировки пользователей и аккаунтов.
  * @singleton
  */
-export class BansManager implements Hookable {
+export class BansManager {
   /**
    * Блокирует пользователя по его ключу.
    *
    * @returns `true` если удалось заблокировать пользователя
    */
-  banAccount(userkey: string): boolean {
+  static banAccount(userkey: string): boolean {
     return false //ЗАГЛУШКА
   }
 
   /**
    * @returns `true` если удалось заблокировать пользователя
    */
-  createBan(subject: string, banType: BanType): boolean {
+  static createBan(subject: string, banType: BanType): boolean {
     return false //ЗАГЛУШКА
   }
 
@@ -28,7 +28,7 @@ export class BansManager implements Hookable {
    *
    * Код состояния: `423 Locked`
    */
-  makeResponse(res: Res, banType: BanType): void {
+  static makeResponse(res: Res, banType: BanType): void {
     res.status(423).send({ banType })
   }
 
@@ -37,31 +37,23 @@ export class BansManager implements Hookable {
   /**
    * Заблокирован ли пользователь **по IP-адресу**?
    */
-  isBanned_byIP(ip: string): boolean {
+  static isBanned_byIP(ip: string): boolean {
     return false //ЗАГЛУШКА
   }
 
   /**
    * Заблокировн ли пользователь **по аккаунту (КЛЮЧУ)**?
    */
-  isBanned_byAccount(userkey: string): boolean {
+  static isBanned_byAccount(userId: string): boolean {
     return false //ЗАГЛУШКА
   }
 
-  /**
-   * (особая)Блокировка по логину **(РЕДКОСТЬ)**.
-   * В данный момент используется только при логине
-   *
-   * Прошу обратить внимание: **не хукается**; вызывается вручную
-   */
-  isBanned_byLogin(login: string): boolean {
-    return false //ЗАГЛУШКА
-  }
-
-  initializeHooks(app: App): void {
+  static initializeHooks(app: App): void {
     /*
     app.addHook("preParsing", (req) => this.isBanned_byIP(req.ip))
     app.addHook("preHandler", this.isBanned_byAccount.bind(this))
 */
   }
+
+  private constructor() {}
 }
