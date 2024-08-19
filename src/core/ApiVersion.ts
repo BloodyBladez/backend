@@ -1,4 +1,4 @@
-import { ApiTypes } from "api-types"
+import { ApiTypes } from "bloodybladez-api-types"
 import { readFileSync } from "fs"
 import path from "path"
 import { App, RequestHandler } from "utility-types"

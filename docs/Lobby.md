@@ -7,7 +7,7 @@ locale: `ru_RU` (native)
 Лобби выглядят так:
 
 ```ts
-interface Lobby.Data {
+interface LobbyData {
   id: string(len 16) //используется для обращений (через API) и идентификации
   name: string(len 3-20*) //кастомное название. Ни на что не влияет
   password: string(len 3-20*) | null //лобби может быть запаролено (на публичных серверах)
@@ -29,7 +29,7 @@ interface Lobby.Data {
 ```ts
 status: 200 //OK
 body: {
-  lobbies: Lobby.Data[]
+  lobbies: LobbyData[]
 }
 //Следующее действие - отрисовать эти данные
 ```
@@ -45,7 +45,7 @@ body: {
 ```ts
 status: 200 //OK
 body: {
-  lobbies: Lobby.Data[]
+  lobbies: LobbyData[]
 }
 //Следующее действие - отрисовать эти данные (в поп-апе с лобби)
 ```
@@ -97,12 +97,12 @@ body: {
 
 ```ts
 {
-  name?: string(len 3-20*)
-  password?: string(len 3-20*) | null
-  maxPlayers?: 2
+  name: string(len 3-20*)
+  password: string(len 3-20*) | null
+  maxPlayers: 2
 
-  removeMembers?: string(len 16)[] (len 1-2)
-  leader?: string(len 16)
+  memberIds: string(len 16)[] (len 1-2)
+  leader: string(len 16)
 }
 ```
 
@@ -110,7 +110,7 @@ body: {
 
 ```ts
 status: 200 //OK
-body: Lobby.Data
+body: LobbyData
 //Следующее действие: обновить поп-ап
 ```
 
@@ -153,7 +153,7 @@ id: string(len 16)
 
 ```ts
 status: 202 //Accepted
-body: Lobby.Data
+body: LobbyData
 //Следующее действие: отрисовать поп-ап с лобби
 ```
 

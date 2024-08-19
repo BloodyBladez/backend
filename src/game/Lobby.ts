@@ -1,11 +1,12 @@
 import { randomBytes } from "crypto"
 import { User } from "../core/User.js"
+import { LobbyData } from "bloodybladez-api-types"
 
 /**
  * Само лобби. Существует исключительно в рантайме.
  */
 export class Lobby {
-  readonly data: Lobby.Data
+  readonly data: LobbyData
 
   delete(): void {
     const lobbyIndex = Lobby.instances.indexOf(this)
@@ -36,11 +37,11 @@ export class Lobby {
 
   static create(
     creationData: Pick<
-      Lobby.Data,
+      LobbyData,
       "name" | "password" | "maxPlayers" | "leaderId"
     >
   ): Lobby {
-    const fullData: Lobby.Data = {
+    const fullData: LobbyData = {
       ...creationData,
       id: Lobby.generateId(),
       memberIds: [creationData.leaderId],
@@ -60,19 +61,8 @@ export class Lobby {
 
   static readonly instances: Lobby[] = []
 
-  private constructor(data: Lobby.Data) {
+  private constructor(data: LobbyData) {
     this.data = data
   }
 }
-export namespace Lobby {
-  export interface Data {
-    id: string
-    /** Кастомное название лобби */
-    name: string
-    password: string | null
-    maxPlayers: number
-
-    memberIds: string[]
-    leaderId: string
-  }
-}
+export namespace Lobby {}
