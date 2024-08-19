@@ -2,6 +2,7 @@ import { accessSync, mkdirSync, readFileSync, writeFileSync } from "fs"
 import * as ini from "ini"
 import path from "path"
 import { Callable } from "utility-types"
+import { Limited, LimitError } from "../lib/Limited.js"
 
 let configInstance: ServerConfig
 const relativeFilePath = path.join(".", "bb-config.ini")
@@ -44,7 +45,7 @@ export interface ServerConfig {
   serverDescription: string
 }
 const ConfigRuntimeTypes: Record<keyof ServerConfig, Callable> = {
-  port: Number,
+  port: Limited(1, Number, 2 ** 32),
   isFriendOnly: Boolean,
   loginMinLength: Number,
   loginMaxLength: Number,
@@ -53,6 +54,8 @@ const ConfigRuntimeTypes: Record<keyof ServerConfig, Callable> = {
   lobbyNameMinLength: Number,
   lobbyNameMaxLength: Number,
   maxAuthTries: Number,
+  serverName: Limited(1, String, 256),
+  serverDescription: Limited(0, String, 4096),
 }
 
 export function initConfig(): void {
@@ -109,7 +112,13 @@ function resolveConfigPropTypes(
   config: Partial<Record<keyof ServerConfig, unknown>>
 ): ServerConfig {
   const keys = Object.getOwnPropertyNames(config) as (keyof ServerConfig)[]
-  return Object.fromEntries(
-    keys.map((key) => [key, ConfigRuntimeTypes[key](config[key])])
-  ) as unknown as ServerConfig
+  const flatTyped = keys.map((key) => [
+    key,
+    ConfigRuntimeTypes[key](config[key]),
+  ]) as [string, any][]
+  flatTyped.forEach(([key, value]) => {
+    if (value === LimitError) throw Errors.getConfig.limitError(key)
+  })
+  const typed = Object.fromEntries(flatTyped) as unknown as ServerConfig
+  return typed
 }
