@@ -34,6 +34,14 @@ export interface ServerConfig {
    * Максимальное кол-во попыток пройти аутефикацию.
    */
   maxAuthTries: number
+  /**
+   * Публичное имя сервера
+   */
+  serverName: string
+  /**
+   * Публичное описание сервера
+   */
+  serverDescription: string
 }
 const ConfigRuntimeTypes: Record<keyof ServerConfig, Callable> = {
   port: Number,
@@ -79,6 +87,8 @@ function getDefaultConfig(): ServerConfig {
     lobbyNameMinLength: 3,
     lobbyNameMaxLength: 20,
     maxAuthTries: 3,
+    serverName: "Unnamed Server",
+    serverDescription: "just a server.",
   }
 }
 function readConfig(): string | null {
