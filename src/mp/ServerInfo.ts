@@ -2,26 +2,33 @@ import { ApiTypes } from "bloodybladez-api-types"
 import { readFileSync } from "fs"
 import path from "path"
 import { App, RequestHandler } from "utility-types"
+import { User } from "../core/User.js"
+import { Lobby } from "../game/Lobby.js"
 
-export class ApiVersion {
+export class ServerInfo {
   static initializeRoutes(app: App): void {
     this.#loadVersions()
 
     app.route({
-      url: "/api-version",
+      url: "/server-info",
       method: "GET",
       handler: this.#requestHandler,
       schema: {},
     })
   }
 
-  static #requestHandler: RequestHandler<ApiTypes["/api-version"]> = async (
+  static #requestHandler: RequestHandler<ApiTypes["/server-info"]> = async (
     req,
     res
   ) => {
     return res.send({
       apiVersion: this.#apiVersion,
       gameVersion: this.#gameVersion,
+      serverName: cfg().serverName,
+      serverDescription: cfg().serverDescription,
+      totalPlayersCount: User.storage.length,
+      currentLobbiesCount: Lobby.instances.length,
+      isFriendOnly: cfg().isFriendOnly,
     })
   }
 

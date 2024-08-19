@@ -1,13 +1,13 @@
 import { fastifyRateLimit } from "@fastify/rate-limit"
 import fastify from "fastify"
 import { BansManager } from "./core/BansManager.js"
-import { ApiVersion } from "./core/ApiVersion.js"
 import { Gate } from "./mp/Gate.js"
 import { GateAuth } from "./mp/GateAuth.js"
 import { GateRegister } from "./mp/GateRegister.js"
 import { LobbyManager } from "./mp/LobbyManager.js"
 import { User } from "./core/User.js"
 import { UserManager } from "./mp/UserManager.js"
+import { ServerInfo } from "./mp/ServerInfo.js"
 
 await import("./globals.js")
 
@@ -30,7 +30,7 @@ await app.register(fastifyRateLimit, {
 User.loadFromStorage()
 
 BansManager.initializeHooks(app)
-ApiVersion.initializeRoutes(app)
+ServerInfo.initializeRoutes(app)
 
 Gate.initializeRoutes(app)
 GateAuth.initializeRoutes(app)

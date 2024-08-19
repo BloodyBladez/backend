@@ -31,5 +31,14 @@ export type Route<Generic extends RouteGenericInterface = any> = RouteOptions<
 export type RequestHandler<Generic extends RouteGenericInterface = any> =
   RouteHandlerMethod<Server, IncomingMessage, ServerResponse, Generic>
 
-export type Constructable = new (...params: unknown[]) => unknown
-export type Callable = (...params: unknown[]) => unknown
+export type Constructable<
+  ReturnType = unknown,
+  ParamsType extends any[] = any[]
+> = new (...params: ParamsType) => ReturnType
+export type Callable<ReturnType = unknown, ParamsType extends any[] = any[]> = (
+  ...params: ParamsType
+) => ReturnType
+
+export type Entries<T extends {}> = {
+  [K in keyof T]: [K, T[K]]
+}[keyof T][]
