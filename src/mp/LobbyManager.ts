@@ -1,4 +1,4 @@
-import { ApiTypes } from "api-types"
+import { ApiTypes } from "bloodybladez-api-types"
 import { JSONSchema } from "json-schema-to-ts"
 import { App, RequestHandler } from "utility-types"
 import { User } from "../core/User.js"
@@ -194,12 +194,6 @@ export class LobbyManager {
     const lobby = Lobby.getById(lobbyId)
     if (!lobby) return res.status(404).send()
     if (lobby.data.leaderId != user.data.id) return res.status(403).send()
-
-    if (newData.removeMembers) {
-      lobby.data.memberIds = lobby.data.memberIds.filter(
-        (it) => !newData.removeMembers?.includes(it)
-      )
-    }
 
     Object.assign(lobby.data, newData) //модифицируем объект, расположенный по ссылке 'lobby.data'
     return res.status(200).send(lobby.data)

@@ -1,4 +1,4 @@
-import { ApiTypes } from "api-types"
+import { ApiTypes } from "bloodybladez-api-types"
 import { JSONSchema } from "json-schema-to-ts"
 import { App, RequestHandler } from "utility-types"
 import { AuthSecret } from "../core/AuthSecret.js"
