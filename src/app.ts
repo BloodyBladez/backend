@@ -1,13 +1,14 @@
+import { fastifyCors } from "@fastify/cors"
 import { fastifyRateLimit } from "@fastify/rate-limit"
 import fastify from "fastify"
 import { BansManager } from "./core/BansManager.js"
+import { User } from "./core/User.js"
 import { Gate } from "./mp/Gate.js"
 import { GateAuth } from "./mp/GateAuth.js"
 import { GateRegister } from "./mp/GateRegister.js"
 import { LobbyManager } from "./mp/LobbyManager.js"
-import { User } from "./core/User.js"
-import { UserManager } from "./mp/UserManager.js"
 import { ServerInfo } from "./mp/ServerInfo.js"
+import { UserManager } from "./mp/UserManager.js"
 
 await import("./globals.js")
 
@@ -25,6 +26,10 @@ await app.register(fastifyRateLimit, {
   timeWindow: "1s",
   ban: 3_000,
   hook: "preParsing",
+})
+
+await app.register(fastifyCors, {
+  origin: "*",
 })
 
 User.loadFromStorage()
