@@ -25,6 +25,17 @@ export const Errors = {
       ),
   },
 
+  Character: {
+    skillNotFound: (skillId: string) =>
+      console.error(
+        `ОШИБКА: Способности с ID '${skillId}' не существует.\n\tЕсли вы используете немодифицированную официальную версию с GitHub'а - просьба сообщить нам о данной ошибке и/или перейти на новую версию сервера (см. https://github.com/BloodyBladez/backend/releases )`
+      ),
+    negativeStamina: () =>
+      console.error(
+        `ОШИБКА: У персонажа отрицательная стамина. Такого не бывает.\n\t${Errors.incorrectServerWork}`
+      ),
+  },
+
   GateRegister: {
     userAlreadyRegistred: (login: string, ip: string) =>
       console.debug(
