@@ -27,6 +27,11 @@ export abstract class Effect {
     physicalDmgModifier: 1,
     magicalDmgModifier: 1,
   }
+  /**
+   * Если `false` - эффект начинает действовать со следующег хода.
+   * Иначе - он действует сразу после наложения.
+   */
+  abstract isInstant: boolean
 
   /**
    * Функция которая вызывается каждый раунд.
@@ -40,6 +45,7 @@ export abstract class Effect {
     ) as Entries<typeof this.temporaryModifiers>)
       this.target.data.current[propName] *= modifier
 
+    if (this.isInstant) this.use()
     this.onStart?.()
   }
   onStart?: () => void = undefined
@@ -70,5 +76,6 @@ export abstract class Effect {
 
   protected constructor(target: Character) {
     this.target = target
+    this.start()
   }
 }
