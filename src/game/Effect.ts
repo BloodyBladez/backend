@@ -17,15 +17,19 @@ export abstract class Effect {
    *
    * Пример: У цели маг.броня `0.4`. Временный модификатор - `2` => маг.броня = `0.8` (0.4\*2)
    */
-  temporaryModifiers: {
+  modifiers: Partial<typeof this.temporaryModifiers> = {}
+
+  private temporaryModifiers: {
     [x in ArmorName]: number
   } & {
     [x in DamageModifierName]: number
   } = {
     physicalArmor: 1,
     magicalArmor: 1,
+    elementalArmor: 1,
     physicalDmgModifier: 1,
     magicalDmgModifier: 1,
+    elementalDmgModifier: 1,
   }
   /**
    * Если `false` - эффект начинает действовать со следующег хода.
@@ -76,6 +80,7 @@ export abstract class Effect {
 
   protected constructor(target: Character) {
     this.target = target
+    Object.assign(this.temporaryModifiers, this.modifiers)
     this.start()
   }
 }
