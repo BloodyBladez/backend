@@ -11,7 +11,7 @@ export class User {
   static readonly USER_ID_LENGTH = 16
 
   /** Является ссылкой на данные в `User.storage` */
-  readonly data: Readonly<UserData>
+  readonly data: UserData
 
   lobbyId: string | undefined
 

@@ -42,7 +42,20 @@ export class Gate {
   ): Promise<void> => {
     const { login, userkey } = req.body
 
+    const maybeUsedId = AuthSecret.findUserId(userkey ?? "")
     const userData = User.storage.find((it) => it.login == login)
+
+    if (maybeUsedId && !userData) {
+      //пользователь сменил логин
+      const userInstance = User.getById(maybeUsedId)
+      if (!userInstance) {
+        Errors.Gate.userDoesNotExist(maybeUsedId)
+        return res.status(500).send()
+      }
+      userInstance.data.login = login
+      return res.status(200).send()
+    }
+
     if (!userData) return res.status(401).send({ firstTime: true })
 
     if (cfg().isFriendOnly) return res.status(200).send()

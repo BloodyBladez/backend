@@ -36,6 +36,13 @@ export const Errors = {
       ),
   },
 
+  Gate: {
+    userDoesNotExist: (userId: string) =>
+      console.error(
+        `ОШИБКА: Пользователь с ID '${userId}' зарегистрирован (и сменил логин), однако не удалось найти его данные в хранилище.\n\tВозможно, произошла рассинхронизация хранилища userkey'ев и данных пользователей.`
+      ),
+  },
+
   GateRegister: {
     userAlreadyRegistred: (login: string, ip: string) =>
       console.debug(

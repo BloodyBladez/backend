@@ -10,6 +10,9 @@ export class AuthSecret {
   static findUserkey(userId: string): string | undefined {
     return AuthSecret.#storage.find(([id]) => id == userId)?.[1]
   }
+  static findUserId(userkey: string): string | undefined {
+    return AuthSecret.#storage.find(([, _userkey]) => _userkey == userkey)?.[0]
+  }
 
   /**
    * Уже встроено в метод создания пользователя.
