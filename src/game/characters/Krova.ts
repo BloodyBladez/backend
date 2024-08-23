@@ -1,7 +1,7 @@
 import { CharacterData, CharacterParameters } from "bloodybladez-api-types"
 import { Character, SkillExecutor } from "../Character.js"
 import { Game } from "../Game.js"
-import { Effect } from "../Effect.js"
+import { Effect, EffFire } from "../Effect.js"
 
 /**
  * Крова.
@@ -74,11 +74,31 @@ export class CharKrova extends Character {
       opponent.damage("physical", 15)
       player.decreaseStamina()
     },
-    "Piercing": (player, opponent) => {},
-    "Shadow hit": (player, opponent) => {},
-    "Fire blade": (player, opponent) => {},
-    "Blessing of the Moon": (player, opponent) => {},
-    "Bloodmoon": (player, opponent) => {},
+    "Piercing": (player, opponent) => {
+      opponent.damage("physical", 10)
+      player.applyEffect(EffPiercingBuff)
+      player.decreaseStamina()
+    },
+    "Shadow hit": (player, opponent) => {
+      opponent.damage("physical", 20)
+      if (player.roundUsedSkills.includes("Piercing"))
+        opponent.damage("physical", 5)
+      player.decreaseStamina()
+    },
+    "Fire blade": (player, opponent) => {
+      opponent.damage("physical", 20)
+      opponent.applyEffect(EffFire)
+      if (player.roundUsedSkills.includes("Piercing"))
+        opponent.applyEffect(EffFire)
+      player.decreaseStamina()
+    },
+    "Blessing of the Moon": (player, opponent) => {
+      // НЕ ГОТОВО !!!!!!!
+    },
+    "Bloodmoon": (player, opponent) => {
+      opponent.damage("magical", 40)
+      player.decreaseStamina(2)
+    },
   }
 
   constructor(game: Game) {
@@ -100,6 +120,23 @@ class EffShadowWarrior extends Effect {
 
   use(): void {
     this.target.damage("physical", 3)
+    this.validateDuration()
+  }
+}
+
+class EffPiercingBuff extends Effect {
+  readonly data = {
+    effectId: "Piercing buff",
+    effectName: "Баф пронзания",
+  }
+  duration = 1
+  isInstant = false
+
+  override modifiers = {
+    magicalArmor: 1.2
+  }
+
+  use(): void {
     this.validateDuration()
   }
 }

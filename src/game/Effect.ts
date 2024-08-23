@@ -84,3 +84,16 @@ export abstract class Effect {
     this.start()
   }
 }
+
+export class EffFire extends Effect {
+  readonly data = {
+    effectIf: "Fire",
+    effectName: "Огонь"
+  }
+  duration = 3
+  isInstant = false
+
+  use(): void {
+    this.target.damage("elemental", 3)
+  }
+}
