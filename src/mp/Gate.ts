@@ -72,7 +72,7 @@ export class Gate {
   static #userkeysAreMatch(login: string, userkey: string): boolean {
     const maybeUser = User.storage.find((it) => it.login == login)
     if (!maybeUser) return false
-    const maybeUserkey = AuthSecret.findUserkey(maybeUser.id)
+    const maybeUserkey = AuthSecret.getById(maybeUser.id)?.userkey
     return maybeUserkey == userkey
   }
 

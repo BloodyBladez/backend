@@ -45,8 +45,8 @@ export class GateRegister {
       return res.status(400).send(Errors.GateRegister.youAlreadyRegistred()) //хакеры идут вон
     }
 
-    const user = User.create({ login, password })
-    const userkey = AuthSecret.findUserkey(user.data.id)
+    const user = User.create(login, password)
+    const userkey = AuthSecret.getById(user.data.id)?.userkey
     if (!userkey) {
       Errors.GateRegister.userDoesNotExist(login)
       return res.status(500).send(Errors.GateRegister.youDoNotExist())

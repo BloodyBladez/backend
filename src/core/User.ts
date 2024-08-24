@@ -34,7 +34,8 @@ export class User {
     const [userId, userkey] = authHeader.split(" ")
     if (!userId || !userkey) return
     const maybeUser = User.instances.find(
-      (it) => it.data.id == userId && AuthSecret.findUserkey(userId) == userkey
+      (it) =>
+        it.data.id == userId && AuthSecret.getById(userId)?.userkey == userkey
     )
     return maybeUser
   }
@@ -44,20 +45,18 @@ export class User {
   /**
    * @param creationData Сериализуемые данные пользователя. Записываются в `User.storage`
    */
-  static create(creationData: Pick<UserData, "login" | "password">): User {
-    const maybeExistsUser = this.instances.find(
-      (it) => it.data.login == creationData.login
-    )
+  static create(login: string, password: string): User {
+    const maybeExistsUser = this.instances.find((it) => it.data.login == login)
     if (maybeExistsUser) {
-      Errors.User.userAlreadyExists(creationData.login)
+      Errors.User.userAlreadyExists(login)
       return maybeExistsUser
     }
 
     const fullData = {
-      ...creationData,
+      login,
       id: User.generateId(),
     }
-    const user = new User(fullData)
+    const user = new User(fullData, password)
     User.instances.push(user)
     //если мы создаём пользователей из хранилища,
     //то кол-во инстанций не будет равно длине хранилищ
@@ -92,12 +91,13 @@ export class User {
     const storageCopy = [...this.storage]
     this.storage.splice(0, this.storage.length)
 
-    for (const userData of storageCopy) User.instances.push(new User(userData))
+    for (const userData of storageCopy)
+      User.instances.push(new User(userData, undefined))
   }
 
-  private constructor(data: UserData) {
+  private constructor(data: UserData, password: string | null | undefined) {
     const index = User.storage.push(data) - 1
     this.data = User.storage[index]
-    AuthSecret.createAccountKey(data.id)
+    if (password !== undefined) AuthSecret.createAccountKey(data.id, password)
   }
 }

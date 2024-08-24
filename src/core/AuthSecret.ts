@@ -1,4 +1,5 @@
-import { ArrayStorage } from "@eds-fw/storage"
+import Storage from "@eds-fw/storage"
+import { SecretUserData } from "bloodybladez-api-types"
 import * as crypto from "crypto"
 
 /**
@@ -7,11 +8,15 @@ import * as crypto from "crypto"
 export class AuthSecret {
   static readonly USERKEY_LENGTH = 46
 
-  static findUserkey(userId: string): string | undefined {
-    return AuthSecret.#storage.find(([id]) => id == userId)?.[1]
+  static getById(userId: string): SecretUserData | undefined {
+    return AuthSecret.#storage.get(userId)
   }
   static findUserId(userkey: string): string | undefined {
-    return AuthSecret.#storage.find(([, _userkey]) => _userkey == userkey)?.[0]
+    let userId: string | undefined
+    AuthSecret.#storage.forEach((value, key) =>
+      value.userkey == userkey ? (userId = key) : undefined
+    )
+    return userId
   }
 
   /**
@@ -19,9 +24,12 @@ export class AuthSecret {
    *
    * @internal
    */
-  static createAccountKey(userId: string): void {
-    if (AuthSecret.#storage.find(([id]) => id == userId)) return
-    AuthSecret.#storage.push([userId, AuthSecret.generateUserkey()])
+  static createAccountKey(userId: string, password: string | null): void {
+    if (AuthSecret.#storage.filter((value, id) => id == userId)) return
+    AuthSecret.#storage.set(userId, {
+      userkey: AuthSecret.generateUserkey(),
+      password,
+    })
     AuthSecret.#storage.save()
   }
 
@@ -34,9 +42,7 @@ export class AuthSecret {
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  static #storage = ArrayStorage.create<[id: string, userkey: string]>(
-    "./data/SECRETS.db.json"
-  )
+  static #storage = Storage.create<SecretUserData>("./data/SECRETS.db.json")
 
   private constructor() {}
 }

@@ -61,7 +61,7 @@ export class GateAuth {
       Errors.GateAuth.userDoesNotExist(login)
       return res.status(500).send(Errors.GateAuth.youDoNotExist())
     }
-    const userkey = AuthSecret.findUserkey(user.id)
+    const userkey = AuthSecret.getById(user.id)?.userkey
     if (!userkey) {
       Errors.GateAuth.userDoesNotExist(login)
       return res.status(500).send(Errors.GateAuth.youDoNotExist())
@@ -76,10 +76,10 @@ export class GateAuth {
   static #tries = new Map<string, number>() //login => tries
 
   static #checkPassword(login: string, password: string) {
-    const maybeUser = User.storage.find(
-      (it) => it.login == login && it.password == password
-    )
-    return Boolean(maybeUser)
+    const maybeUser = User.storage.find((it) => it.login == login)
+    if (!maybeUser) return
+    const secret = AuthSecret.getById(maybeUser.id)
+    return secret?.password == password
   }
 
   private constructor() {}
