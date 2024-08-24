@@ -65,4 +65,3 @@ export class Lobby {
     this.data = data
   }
 }
-export namespace Lobby {}

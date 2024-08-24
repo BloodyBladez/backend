@@ -23,7 +23,7 @@
   },
   "scripts": {
     "build": "rm -r ./dist; npx tsc",
-    "ts-watch": "rm -r ./dist; npx tsc --watch",
+    "dev": "rm -r ./dist; npx tsc --watch",
     "start": "node ./dist/app.js"
   }
 }
