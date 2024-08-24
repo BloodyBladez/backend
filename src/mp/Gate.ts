@@ -56,10 +56,14 @@ export class Gate {
       return res.status(200).send()
     }
 
+    if (cfg().isFriendOnly) {
+      if (!userData) {
+        User.create(login, null)
+      }
+      return res.status(200).send()
+    }
+
     if (!userData) return res.status(401).send({ firstTime: true })
-
-    if (cfg().isFriendOnly) return res.status(200).send()
-
     if (!userkey) return res.status(400).send()
     if (!this.#userkeysAreMatch(login, userkey))
       return res.status(401).send({ firstTime: false })
