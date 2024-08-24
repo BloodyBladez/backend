@@ -56,6 +56,7 @@ export class CharKrova extends Character {
         skillId: "Bloodmoon",
       },
     ],
+    passiveSkills: [],
   }
 
   protected readonly skills: Record<string, SkillExecutor> = {

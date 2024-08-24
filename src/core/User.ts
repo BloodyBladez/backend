@@ -45,7 +45,7 @@ export class User {
   /**
    * @param creationData Сериализуемые данные пользователя. Записываются в `User.storage`
    */
-  static create(login: string, password: string): User {
+  static create(login: string, password: string | null): User {
     const maybeExistsUser = this.instances.find((it) => it.data.login == login)
     if (maybeExistsUser) {
       Errors.User.userAlreadyExists(login)

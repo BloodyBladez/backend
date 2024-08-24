@@ -1,7 +1,6 @@
 import { CharacterData, CharacterParameters } from "bloodybladez-api-types"
 import { Character, SkillExecutor } from "../Character.js"
 import { Game } from "../Game.js"
-import { Effect } from "../Effect.js"
 
 export class CharAres extends Character {
   readonly data: CharacterData = {
@@ -56,6 +55,7 @@ export class CharAres extends Character {
         skillId: "Flash",
       },
     ],
+    passiveSkills: [],
   }
 
   protected readonly skills: Record<string, SkillExecutor> = {

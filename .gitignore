@@ -2,6 +2,7 @@ bb-config.ini
 secret.json
 _all-assets/
 data/
+.vscode/
 
 # Logs
 logs
