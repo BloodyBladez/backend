@@ -1,7 +1,8 @@
 import { CharacterData, CharacterParameters } from "bloodybladez-api-types"
 import { Character, SkillExecutor } from "../Character.js"
 import { Game } from "../Game.js"
-import { Effect, EffFire } from "../Effect.js"
+import { Effect } from "../Effect.js"
+import { EffFire } from "../CommonEffects.js"
 
 /**
  * Крова.
@@ -133,7 +134,7 @@ class EffPiercingBuff extends Effect {
   isInstant = false
 
   override modifiers = {
-    magicalArmor: 1.2
+    magicalArmor: 1.2,
   }
 
   use(): void {
