@@ -58,10 +58,7 @@ export class User {
     }
     const user = new User(fullData, password)
     User.instances.push(user)
-    //если мы создаём пользователей из хранилища,
-    //то кол-во инстанций не будет равно длине хранилищ
-    //(...пока мы не проитерируем всех пользователей)
-    if (this.instances.length == this.storage.length) this.storage.save()
+    this.storage.save()
     return user
   }
 
