@@ -2,7 +2,7 @@ import { accessSync, mkdirSync, readFileSync, writeFileSync } from "fs"
 import * as ini from "ini"
 import path from "path"
 import { Callable } from "utility-types"
-import { Limited, LimitError } from "../lib/Limited.js"
+import { LimitError } from "../lib/Limited.js"
 
 let configInstance: ServerConfig
 const relativeFilePath = path.join(".", "bb-config.ini")
@@ -19,18 +19,6 @@ export interface ServerConfig {
    * Влияет на аутефикацию, регистрацию и возможность запустить бой без лидера лобби
    */
   isFriendOnly: boolean
-  /** Технический лимит. @internal */
-  loginMinLength: number
-  /** Технический лимит. @internal */
-  loginMaxLength: number
-  /** Технический лимит. @internal */
-  passwordMinLength: number
-  /** Технический лимит. @internal */
-  passwordMaxLength: number
-  /** Технический лимит. @internal */
-  lobbyNameMinLength: number
-  /** Технический лимит. @internal */
-  lobbyNameMaxLength: number
   /**
    * Максимальное кол-во попыток пройти аутефикацию.
    */
@@ -45,17 +33,11 @@ export interface ServerConfig {
   serverDescription: string
 }
 const ConfigRuntimeTypes: Record<keyof ServerConfig, Callable> = {
-  port: Limited(1, Number, 2 ** 32),
+  port: Limits.httpPort.toConverter(),
   isFriendOnly: Boolean,
-  loginMinLength: Number,
-  loginMaxLength: Number,
-  passwordMinLength: Number,
-  passwordMaxLength: Number,
-  lobbyNameMinLength: Number,
-  lobbyNameMaxLength: Number,
   maxAuthTries: Number,
-  serverName: Limited(1, String, 256),
-  serverDescription: Limited(0, String, 4096),
+  serverName: Limits.serverNameLen.toConverter(),
+  serverDescription: Limits.serverDescriptionLen.toConverter(),
 }
 
 export function initConfig(): void {
@@ -83,12 +65,6 @@ function getDefaultConfig(): ServerConfig {
   return {
     port: 6969, //xd
     isFriendOnly: true,
-    loginMinLength: 3,
-    loginMaxLength: 20,
-    passwordMinLength: 3,
-    passwordMaxLength: 20,
-    lobbyNameMinLength: 3,
-    lobbyNameMaxLength: 20,
     maxAuthTries: 3,
     serverName: "Unnamed Server",
     serverDescription: "just a server.",

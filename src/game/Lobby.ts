@@ -45,6 +45,7 @@ export class Lobby {
       ...creationData,
       id: Lobby.generateId(),
       memberIds: [creationData.leaderId],
+      characterIds: new Array(creationData.maxPlayers).fill(null),
     }
     const lobby = new Lobby(fullData)
     Lobby.instances.push(lobby)

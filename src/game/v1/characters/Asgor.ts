@@ -3,7 +3,8 @@ import { Character, SkillExecutor } from "../Character.js"
 import { Game } from "../Game.js"
 import { EffFire } from "../CommonEffects.js"
 
-export class CharAres extends Character {
+export class CharAsgor extends Character {
+  static readonly ID = "Asgor"
   readonly data: CharacterData = {
     maximum: {
       health: 500,
@@ -17,7 +18,7 @@ export class CharAres extends Character {
     },
     current: undefined as unknown as CharacterParameters,
     characterName: "Асгор",
-    characterId: "Asgor",
+    characterId: CharAsgor.ID,
     skills: [
       {
         skillName: "Регенерация",

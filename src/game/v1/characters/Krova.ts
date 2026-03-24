@@ -8,6 +8,7 @@ import { EffFire } from "../CommonEffects.js"
  * Крова.
  */
 export class CharKrova extends Character {
+  static readonly ID = "Krova"
   readonly data: CharacterData = {
     maximum: {
       health: 400,
@@ -21,7 +22,7 @@ export class CharKrova extends Character {
     },
     current: undefined as unknown as CharacterParameters,
     characterName: "Крова",
-    characterId: "Krova",
+    characterId: CharKrova.ID,
     skills: [
       {
         skillName: "Выпад",

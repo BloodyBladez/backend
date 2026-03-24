@@ -2,7 +2,8 @@ import { CharacterData, CharacterParameters } from "bloodybladez-api-types"
 import { Character, SkillExecutor } from "../Character.js"
 import { Game } from "../Game.js"
 
-export class CharAres extends Character {
+export class CharAris extends Character {
+  static readonly ID = "Aris"
   readonly data: CharacterData = {
     maximum: {
       health: 380,
@@ -16,7 +17,7 @@ export class CharAres extends Character {
     },
     current: undefined as unknown as CharacterParameters,
     characterName: "Арис",
-    characterId: "Aris",
+    characterId: CharAris.ID,
     skills: [
       {
         skillName: "Воодушевление",

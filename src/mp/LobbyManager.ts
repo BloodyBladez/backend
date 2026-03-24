@@ -3,6 +3,7 @@ import { JSONSchema } from "json-schema-to-ts"
 import { App, RequestHandler } from "utility-types"
 import { User } from "../core/User.js"
 import { Lobby } from "../game/Lobby.js"
+import { SessionManager } from "./game/SessionManager.js"
 
 const MAX_SUPPORTED_LOBBY_MEMBERS = 2
 const MIN_SUPPORTED_LOBBY_MEMBERS = 2
@@ -135,6 +136,27 @@ export class LobbyManager {
     })
 
     app.route({
+      url: "/lobby/select-character",
+      method: "POST",
+      handler: this.#selectCharacter,
+
+      schema: {
+        body: {
+          type: "object",
+          required: ["characterId"],
+          properties: {
+            characterId: {
+              type: "string",
+              nullable: true,
+              minLength: cfg().passwordMinLength,
+              maxLength: cfg().passwordMaxLength,
+            },
+          },
+        } satisfies JSONSchema,
+      },
+    })
+
+    app.route({
       url: "/lobby/launch-game",
       method: "POST",
       handler: this.#launchGame,
@@ -238,6 +260,9 @@ export class LobbyManager {
     res.status(200).send()
   }
 
+  static #selectCharacter: RequestHandler<ApiTypes["/lobby/select-character"]> =
+    async (req, res): Promise<void> => {}
+
   static #launchGame: RequestHandler<ApiTypes["/lobby/launch-game"]> = async (
     req,
     res
@@ -251,7 +276,7 @@ export class LobbyManager {
     if (!lobby) return res.status(404).send()
     if (lobby.data.leaderId != user.data.id) return res.status(403).send()
 
-    //TODO
-    res.status(501).send()
+    const connectionId = SessionManager.create(lobby)
+    res.status(201).send(connectionId)
   }
 }

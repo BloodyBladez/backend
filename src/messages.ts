@@ -11,7 +11,7 @@ export const Errors = {
 
   AuthSecret: {
     userkeyNotFound: (login: string) =>
-      `Ключ (userkey) пользователя '${login}' не найден.\n\tВозможно, произошла рассинхронизация двух хранилищ вследствие ручного вмешательства (не трожьте всё в папке 'data/') ИЛИ багов в коде`,
+      `Ключ (userkey) пользователя '${login}' не найден.\n\tВозможно, произошла рассинхронизация двух хранилищ вследствие ручного вмешательства (не трожьте всё в папке 'data/') ИЛИ багов в коде\n\t${Errors.incorrectServerWork}`,
   },
 
   User: {
@@ -33,6 +33,10 @@ export const Errors = {
     negativeStamina: () =>
       console.error(
         `ОШИБКА: У персонажа отрицательная стамина. Такого не бывает.\n\t${Errors.incorrectServerWork}`
+      ),
+    alreadyRegistered: (charId: string) =>
+      console.warn(
+        `ПРЕДУПРЕЖДЕНИЕ: Персонаж с ID '${charId}' уже зарегистрирован. Перепроверьте файл 'game/characters/INDEX'`
       ),
   },
 

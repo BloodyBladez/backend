@@ -5,8 +5,13 @@ import {
 } from "bloodybladez-api-types"
 import { Game } from "./Game.js"
 import { Effect } from "./Effect.js"
+import { Characters } from "./characters/index.js"
+import { Constructable } from "utility-types"
 
 export type SkillExecutor = (player: Character, opponent: Character) => unknown
+export type CharacterStatic = {
+  readonly ID: string
+} & Constructable<Character>
 
 /**
  * Игровой персонаж (существует исключительно в сражении)
@@ -61,6 +66,14 @@ export abstract class Character {
     const effectInstance = new effect() as Effect
     this.currentEffects.push(effectInstance)
     return effectInstance
+  }
+
+  /**
+   * @param characterId CLEAN DATA
+   */
+  static getById(characterId: string): CharacterStatic | undefined {
+    const allCharacters = Object.values(Characters)
+    return allCharacters.filter((it) => it.ID == characterId)[0]
   }
 
   constructor(game: Game) {

@@ -1,7 +1,11 @@
-import { randomInt } from "crypto"
+import { randomBytes, randomInt } from "crypto"
 import { Character } from "./Character.js"
+import { Lobby } from "../Lobby.js"
+import { User } from "../../core/User.js"
 
 export class Game {
+  readonly gameId: string
+  readonly players: Record<string, Character> //[userId, character]
   /** Ходящий игрок первый в массиве */
   characters: Character[] = []
   /** Ходящий персонаж */
@@ -23,8 +27,22 @@ export class Game {
 
   endGame(): void {}
 
-  constructor(characters: Character[]) {
-    const rand = randomInt(0, characters.length)
+  static readonly GAME_ID_LENGTH = 16
+
+  static generateId(): string {
+    return randomBytes(this.GAME_ID_LENGTH / 2).toString("hex")
+  }
+
+  constructor(players: Map<User, Character>) {
+    this.gameId = randomBytes(8).toString("base64url")
+
+    const users = Array.from(players.keys())
+    const characters = Array.from(players.values())
+    this.players = Object.fromEntries(
+      users.map((user, i) => [user.data.id, characters[i]])
+    )
+
+    const rand = randomInt(0, players.size)
     const currentCharacter = characters.splice(rand, 1)
     characters.unshift(currentCharacter[0])
 
